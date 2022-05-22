@@ -1,9 +1,14 @@
 package hello.core.member;
 
 
+import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 import java.util.Map;
 
+
+
+@Component
 public class MemoryMemberRepository implements MemberRepository {  //MemberRepository 인터페이스를 상속받음
 
 
