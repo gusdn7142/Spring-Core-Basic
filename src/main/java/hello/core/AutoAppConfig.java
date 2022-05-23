@@ -17,6 +17,8 @@ import org.springframework.context.annotation.FilterType;
 
 
 
+
+
 public class AutoAppConfig {
 
 //    @Bean(name = "memoryMemberRepository")   //이미 자동으로 설정되어 있는 Bean을 이름이 같게 하나 더 생성
