@@ -18,10 +18,7 @@ public class MemberServiceTest {
         memberService = appConfig.memberService();
     }
 
-
 //    MemberService memberService = new MemberServiceImpl();
-
-
 
 
     @Test
