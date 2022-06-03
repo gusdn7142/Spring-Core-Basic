@@ -14,8 +14,10 @@ public class BeanLifeCycleTest {
     @Test
     public void lifeCycleTest(){
         ConfigurableApplicationContext ac = new AnnotationConfigApplicationContext(LifeCycleConfig.class);
-        NetworkClient client = ac.getBean((NetworkClient.class));  //타입으로 Bean 조회
-        ac.close();
+        //NetworkClient client = ac.getBean((NetworkClient.class));  //타입으로 Bean 조회
+
+        //System.out.println("not bad " + client);
+        ac.close();   //이 메소드가 호출되기 직전에 소멸 콜백 함수가 호출된다.
 
     }
 
