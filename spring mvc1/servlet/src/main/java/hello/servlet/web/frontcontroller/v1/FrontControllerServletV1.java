@@ -20,7 +20,7 @@ import java.util.Map;
 @WebServlet(name = "frontControllerServletV1", urlPatterns = "/front-controller/v1/*")  //서블릿과 서블릿 url( *는 v1 이하 경로로 들어올시 호출된다는 뜻)  설정
 public class FrontControllerServletV1 extends HttpServlet {
 
-    //어떤 url이든 ControllerV1을 담기 위해 map 선언
+    //URL 매핑정보를 담을 ControllerV1을 담기 위해 map 선언
     private Map<String, ControllerV1> controllerMap = new HashMap<>();
 
     //서블릿 생성자 생성 : map에 컨트롤러들을 담음
