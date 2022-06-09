@@ -62,6 +62,7 @@ public class FrontControllerServletV4 extends HttpServlet {
 
 
 
+
     //논리적인 뷰 이름을 물리적인 뷰 경로로 변환
     private MyView viewResolver(String viewName) {
         return new MyView("/WEB-INF/views/" + viewName + ".jsp");

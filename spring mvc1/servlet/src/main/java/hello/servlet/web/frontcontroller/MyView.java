@@ -29,6 +29,7 @@ public class MyView {  //각 컨트롤러의 로직을 여기서 수행
     }
 
 
+
     //v3부터 적용됨
     public void render(Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         modelToRequestAttribute(model, request);
