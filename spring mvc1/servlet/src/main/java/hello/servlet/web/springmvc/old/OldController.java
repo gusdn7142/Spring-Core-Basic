@@ -15,8 +15,11 @@ public class OldController implements Controller {
     public ModelAndView handleRequest(HttpServletRequest request,
                                       HttpServletResponse response) throws Exception {
         System.out.println("OldController.handleRequest");
-        return null;
+        return new ModelAndView("new-form");
+        //"WEB-INF/views/new-form.jsp" 처럼 물리적인 경로를 적어주어도 동작을 합니다~!
     }
+
+
 
 
 }
