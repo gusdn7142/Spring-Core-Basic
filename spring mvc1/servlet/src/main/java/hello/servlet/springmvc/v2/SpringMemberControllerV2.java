@@ -1,4 +1,4 @@
-package hello.servlet.web.springmvc.v1;
+package hello.servlet.springmvc.v2;
 
 
 import hello.servlet.domain.member.Member;
@@ -9,17 +9,34 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
+/**
+ * 클래스 단위 -> 메서드 단위
+ * @RequestMapping 클래스 레벨과 메서드 레벨 조합
+ */
 
 @Controller
-public class SpringMemberSaveControllerV1 {
+@RequestMapping("/springmvc/v2/members")
+public class SpringMemberControllerV2 {
 
-
+    //싱글톤 객체 생성
     private MemberRepository memberRepository = MemberRepository.getInstance();
 
 
-    @RequestMapping("/springmvc/v1/members/save")
-    public ModelAndView process(HttpServletRequest request, HttpServletResponse response) {
+    //회원 가입 요청
+    @RequestMapping("/new-form")
+    public ModelAndView newForm() {
+
+        //ModelAndView에 논리 뷰 이름 리턴
+        return new ModelAndView("new-form");
+    }
+
+
+
+    //회원 가입 응답
+    @RequestMapping("/save")
+    public ModelAndView save(HttpServletRequest request, HttpServletResponse response) {
 
         //요청으로 받은 파라미터 값 ("이름", "나이") 조회
         String username = request.getParameter("username");
@@ -35,9 +52,25 @@ public class SpringMemberSaveControllerV1 {
         //ModelAndView에 회원 정보 저장
         mv.addObject("member", member);
         return mv;
-
-
     }
+
+
+
+    //전체 회원 목록 조회
+    @RequestMapping
+    public ModelAndView members() {
+
+        //모든 회원 정보 조회
+        List<Member> members = memberRepository.findAll();
+
+        //ModelAndView에 논리 뷰 이름 저장
+        ModelAndView mv = new ModelAndView("members");
+
+        //ModelAndView에 회원 정보 저장
+        mv.addObject("members", members);
+        return mv;
+    }
+
 
 
 
