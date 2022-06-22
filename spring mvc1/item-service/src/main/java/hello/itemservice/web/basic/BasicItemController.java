@@ -60,8 +60,11 @@ public class BasicItemController {
         return "basic/addForm";   //basic/addForm 논리 뷰 경로를 리턴
     }
 
+
+
+
     /* (form 전송 후) 상품 등록 폼 */
-    @PostMapping("/add")
+    //@PostMapping("/add")
     public String addItemV1(@RequestParam String itemName,
                             @RequestParam int price,
                             @RequestParam Integer quantity,
@@ -83,55 +86,77 @@ public class BasicItemController {
 
 
 
+    //@PostMapping("/add")
+    public String addItemV2(@ModelAttribute("item") Item item, Model model) {
+
+        itemRepository.save(item);
+        //model.addAttribute("item", item); //자동 추가, 생략 가능
+
+        return "basic/item";
+    }
 
 
-//    //    @PostMapping("/add")
-//    public String addItemV2(@ModelAttribute("item") Item item, Model model) {
+
+
+    //@PostMapping("/add")
+    public String addItemV3(@ModelAttribute Item item) {
+        itemRepository.save(item);
+        return "basic/item";
+    }
+
+
+
+    @PostMapping("/add")
+    public String addItemV4(Item item) {
+        itemRepository.save(item);
+        return "basic/item";
+    }
+
+
+
 //
-//        itemRepository.save(item);
-////      model.addAttribute("item", item); //자동 추가, 생략 가능
 //
-//        return "basic/item";
-//    }
+////    //    @PostMapping("/add")
+////    public String addItemV5(Item item) {
+////        itemRepository.save(item);
+////        return "redirect:/basic/items/" + item.getId();
+////    }
 //
-//    //    @PostMapping("/add")
-//    public String addItemV3(@ModelAttribute Item item) {
-//        itemRepository.save(item);
-//        return "basic/item";
-//    }
 //
-//    //    @PostMapping("/add")
-//    public String addItemV4(Item item) {
-//        itemRepository.save(item);
-//        return "basic/item";
-//    }
 //
-//    //    @PostMapping("/add")
-//    public String addItemV5(Item item) {
-//        itemRepository.save(item);
-//        return "redirect:/basic/items/" + item.getId();
-//    }
-//
-//    @PostMapping("/add")
-//    public String addItemV6(Item item, RedirectAttributes redirectAttributes) {
-//        Item savedItem = itemRepository.save(item);
-//        redirectAttributes.addAttribute("itemId", savedItem.getId());
+////    @PostMapping("/add")
+////    public String addItemV6(Item item, RedirectAttributes redirectAttributes) {
+////        Item savedItem = itemRepository.save(item);
+////        redirectAttributes.addAttribute("itemId", savedItem.getId());
 //        redirectAttributes.addAttribute("status", true);
 //        return "redirect:/basic/items/{itemId}";
 //    }
-//
-//    @GetMapping("/{itemId}/edit")
-//    public String editForm(@PathVariable Long itemId, Model model) {
-//        Item item = itemRepository.findById(itemId);
-//        model.addAttribute("item", item);
-//        return "basic/editForm";
-//    }
-//
-//    @PostMapping("/{itemId}/edit")
-//    public String edit(@PathVariable Long itemId, @ModelAttribute Item item) {
-//        itemRepository.update(itemId, item);
-//        return "redirect:/basic/items/{itemId}";
-//    }
+
+
+
+    /* (form 전송 전) 상품 수정 폼 */
+    @GetMapping("/{itemId}/edit")
+    public String editForm(@PathVariable Long itemId, Model model) {
+
+        //상품 1개 조회
+        Item item = itemRepository.findById(itemId);
+
+        //model 객체에  item 객체 삽입
+        model.addAttribute("item", item);
+
+        return "basic/editForm"; //basic/editForm 논리 뷰 경로를 리턴
+    }
+
+
+    /* (form 전송 후) 상품 수정 폼 */
+    @PostMapping("/{itemId}/edit")
+    public String edit(@PathVariable Long itemId, @ModelAttribute Item item) {
+
+        //상품 정보 업데이트
+        itemRepository.update(itemId, item);
+
+        return "redirect:/basic/items/{itemId}";  //상세페이지 논리뷰 경로로 리다이렉트
+    }
 
 
 
