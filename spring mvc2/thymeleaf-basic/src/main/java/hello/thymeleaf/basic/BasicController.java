@@ -63,18 +63,11 @@ public class BasicController {
 
 
 
-
-
-
-
-
-
-/*    @GetMapping("/basic-objects")
+    @GetMapping("/basic-objects")
     public String basicObjects(HttpSession session) {
         session.setAttribute("sessionData", "Hello Session");
         return "basic/basic-objects";
     }
-
 
 
     @Component("helloBean")
@@ -84,25 +77,37 @@ public class BasicController {
         }
     }
 
+
+
+
     @GetMapping("/date")
     public String date(Model model) {
         model.addAttribute("localDateTime", LocalDateTime.now());
         return "basic/date";
     }
 
-    @GetMapping("link")
+
+    @GetMapping("/link")
     public String link(Model model) {
         model.addAttribute("param1", "data1");
         model.addAttribute("param2", "data2");
+        model.addAttribute("param3", "data3");
         return "basic/link";
 
     }
+
+
+
+
+
 
     @GetMapping("/literal")
     public String literal(Model model) {
         model.addAttribute("data", "Spring!");
         return "basic/literal";
     }
+
+
 
     @GetMapping("/operation")
     public String operation(Model model) {
@@ -115,6 +120,12 @@ public class BasicController {
     public String attribute() {
         return "basic/attribute";
     }
+
+
+
+
+
+      /*
 
     @GetMapping("/each")
     public String each(Model model) {
