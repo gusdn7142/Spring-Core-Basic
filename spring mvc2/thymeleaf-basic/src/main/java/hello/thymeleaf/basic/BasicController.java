@@ -124,14 +124,13 @@ public class BasicController {
 
 
 
-
-      /*
-
     @GetMapping("/each")
     public String each(Model model) {
         addUsers(model);
         return "basic/each";
     }
+
+
 
     @GetMapping("/condition")
     public String condition(Model model) {
@@ -139,17 +138,28 @@ public class BasicController {
         return "basic/condition";
     }
 
+
+
+
+
     @GetMapping("/comments")
     public String comments(Model model) {
         model.addAttribute("data", "Spring!");
         return "basic/comments";
     }
 
+
+
+
+
     @GetMapping("/block")
     public String block(Model model) {
         addUsers(model);
         return "basic/block";
     }
+
+
+
 
     @GetMapping("/javascript")
     public String javascript(Model model) {
@@ -161,16 +171,19 @@ public class BasicController {
     }
 
 
+
+
+
+
+
     private void addUsers(Model model) {
         List<User> list = new ArrayList<>();
         list.add(new User("UserA", 10));
         list.add(new User("UserB", 20));
         list.add(new User("UserC", 30));
 
-        model.addAttribute("users", list);
-    }*/
-
-
+        model.addAttribute("users", list);  //model에 list 삽입
+    }
 
 
 

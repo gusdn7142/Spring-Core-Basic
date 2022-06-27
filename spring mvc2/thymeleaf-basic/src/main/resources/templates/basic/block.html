@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<th:block th:each="user : ${users}">
+
+
+    <div>
+        <table border="1">
+        <tr>
+            <th>사용자 이름</th>
+            <th>사용자 나이</th>
+        </tr>
+        <tr>
+            <td th:text="${user.username}"> </td>
+            <td th:text="${user.age}"></td>
+        </tr>
+        </table>
+    </div>
+
+    <div>
+        <table border="1">
+        <tr>
+            <th>요약</th>
+        </tr>
+        <tr>
+        <td th:text="${user.username} + ' / ' + ${user.age}"> </td>
+        </tr>
+        </table>
+    </div>
+
+    <br>
+
+</th:block>
+
+</body>
+</html>
