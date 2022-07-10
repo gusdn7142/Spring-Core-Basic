@@ -10,6 +10,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
@@ -24,6 +26,16 @@ import java.util.Map;
 public class ValidationItemControllerV2 {
 
     private final ItemRepository itemRepository;
+    private final ItemValidator itemValidator;
+
+
+    @InitBinder   //이 컨트롤러가 호출될때마다 자동으로 실행됨.
+    public void init(WebDataBinder dataBinder) {
+        dataBinder.addValidators(itemValidator);  //검증기를 넣음.
+    }
+
+
+
 
     @GetMapping
     public String items(Model model) {
@@ -196,7 +208,7 @@ public class ValidationItemControllerV2 {
 
 
 
-    @PostMapping("/add")
+    //@PostMapping("/add")
     public String addItemV4(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes , Model model) {
 
         log.info("objectName={}", bindingResult.getObjectName());
@@ -247,11 +259,67 @@ public class ValidationItemControllerV2 {
 
 
 
+    //@PostMapping("/add")
+    public String addItemV5(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes , Model model) {
+
+        log.info("objectName={}", bindingResult.getObjectName());
+        log.info("target={}", bindingResult.getTarget());
+
+
+        //검증 로직
+        //new ItemValidator().validate(item,bindingResult);
+        itemValidator.validate(item, bindingResult);   //검증 객체, bindingResult
+
+
+       //검증에 실패하면 다시 입력 폼으로
+        //if (!errors.isEmpty()) {
+        if(bindingResult.hasErrors()) {
+            log.info("errors = {} ", bindingResult);
+
+            //model.addAttribute("errors", errors);
+            return "validation/v2/addForm";
+        }
+
+
+        //성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
 
 
 
 
 
+    @PostMapping("/add")
+    public String addItemV6(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes , Model model) {
+
+        log.info("objectName={}", bindingResult.getObjectName());
+        log.info("target={}", bindingResult.getTarget());
+
+
+        //검증 로직
+        //new ItemValidator().validate(item,bindingResult);
+        //itemValidator.validate(item, bindingResult);   //검증 객체, bindingResult
+
+
+        //검증에 실패하면 다시 입력 폼으로
+        //if (!errors.isEmpty()) {
+        if(bindingResult.hasErrors()) {
+            log.info("errors = {} ", bindingResult);
+
+            //model.addAttribute("errors", errors);
+            return "validation/v2/addForm";
+        }
+
+
+        //성공 로직
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/validation/v2/items/{itemId}";
+    }
 
 
 
