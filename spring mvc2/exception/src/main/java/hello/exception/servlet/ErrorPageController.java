@@ -45,6 +45,32 @@ public class ErrorPageController {
 
 
 
+    @RequestMapping(value = "/error-page/500", produces = MediaType.APPLICATION_JSON_VALUE)  //produces : 서버가 클라이언트에게 반환하는 데이터 타입 명시
+    public ResponseEntity<Map<String, Object>> errorPage500Api( HttpServletRequest request,
+                                                                HttpServletResponse response) {
+
+        log.info("API errorPage 500");
+
+        Map<String, Object> result = new HashMap<>();
+
+        Exception ex = (Exception) request.getAttribute(ERROR_EXCEPTION);   //request객체에서 exception 객체 불러오기
+        result.put("status", request.getAttribute(ERROR_STATUS_CODE));   //result map에 request 객체에서 불러온 http Error status Code 입력
+        result.put("message", ex.getMessage());   //result map에 오류 메시지 입력
+        //result.put("message2", request.getAttribute(ERROR_MESSAGE));   //result map에 오류 메시지 입력
+
+        Integer statusCode = (Integer) request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE);  //상태코드
+
+        return new ResponseEntity<>(result, HttpStatus.valueOf(statusCode));   //map 객체 result와 http status code 반환
+    }
+
+
+
+
+
+
+
+
+
     private void printErrorInfo(HttpServletRequest request) {
         log.info("ERROR_EXCEPTION: {}", request.getAttribute(ERROR_EXCEPTION));
         log.info("ERROR_EXCEPTION_TYPE: {}", request.getAttribute(ERROR_EXCEPTION_TYPE));
