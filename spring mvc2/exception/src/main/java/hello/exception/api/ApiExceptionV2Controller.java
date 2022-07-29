@@ -15,38 +15,38 @@ import org.springframework.web.bind.annotation.*;
 public class ApiExceptionV2Controller {
 
 
-    //컨트롤러에서 발생한 IllegalArgumentException를 잡는다.
-    @ResponseStatus(HttpStatus.BAD_REQUEST)   //상태코드 지정 (지정 안하면 200으로 나감)
-    @ExceptionHandler(IllegalArgumentException.class)
-    public ErrorResult illegalExHandler(IllegalArgumentException e){
-        log.error("[exceptionHandler] ex", e);
-
-        return new ErrorResult("BAD", e.getMessage());
-    }
-
-
-
-
-    //컨트롤러에서 발생한 UserException을 잡는다.
-    @ExceptionHandler                 //생략가능 : (UserException.class)
-    public ResponseEntity<ErrorResult> userExHandler(UserException e){
-        log.error("[exceptionHandler] ex", e);
-
-        ErrorResult errorResult = new ErrorResult("USER-EX", e.getMessage());
-        return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
-
-    }
+//    //컨트롤러에서 발생한 IllegalArgumentException를 잡는다.
+//    @ResponseStatus(HttpStatus.BAD_REQUEST)   //상태코드 지정 (지정 안하면 200으로 나감)
+//    @ExceptionHandler(IllegalArgumentException.class)
+//    public ErrorResult illegalExHandler(IllegalArgumentException e){
+//        log.error("[exceptionHandler] ex", e);
+//
+//        return new ErrorResult("BAD", e.getMessage());
+//    }
 
 
 
-    //컨트롤러에서 발생한 Exception을 잡는다.   (자식들까지 처리 가능!!)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)   //상태코드 지정 (지정 안하면 200으로 나감)
-    @ExceptionHandler                 //생략가능 : (Exception.class)
-    public ErrorResult exHandler(Exception e){
-        log.error("[exceptionHandler] ex", e);
 
-        return new ErrorResult("EX", "내부 오류");
-    }
+//    //컨트롤러에서 발생한 UserException을 잡는다.
+//    @ExceptionHandler                 //생략가능 : (UserException.class)
+//    public ResponseEntity<ErrorResult> userExHandler(UserException e){
+//        log.error("[exceptionHandler] ex", e);
+//
+//        ErrorResult errorResult = new ErrorResult("USER-EX", e.getMessage());
+//        return new ResponseEntity<>(errorResult, HttpStatus.BAD_REQUEST);
+//
+//    }
+
+
+
+//    //컨트롤러에서 발생한 Exception을 잡는다.   (자식들까지 처리 가능!!)
+//    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)   //상태코드 지정 (지정 안하면 200으로 나감)
+//    @ExceptionHandler                 //생략가능 : (Exception.class)
+//    public ErrorResult exHandler(Exception e){
+//        log.error("[exceptionHandler] ex", e);
+//
+//        return new ErrorResult("EX", "내부 오류");
+//    }
 
 
 
