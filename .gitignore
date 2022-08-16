@@ -1,0 +1,3 @@
+ex1-hello-jpa/src/main/resources/META-INF/persistence.xml
+ex1-hello-jpa/target/classes/META-INF/persistence.xml
+ex1-hello-jpa/pom.xml
