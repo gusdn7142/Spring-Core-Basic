@@ -10,7 +10,7 @@ public class JpaMain {
 
     public static void main(String[] args) {
 
-        // 엔티티 매니저 팩토리 생성
+        //엔티티 매니저 팩토리 생성
         EntityManagerFactory emf = Persistence.createEntityManagerFactory("hello");
 
         // 엔티티 매니저 생성
@@ -22,23 +22,45 @@ public class JpaMain {
 
         try {
 
-//            Member findMember = em.find(Member.class, 1L);
-            //System.out.println(findMember.getId());
-            //System.out.println(findMember.getName());
-
-//            findMember.setName("hellojpa");  //Update 쿼리가 날아감..
+//            //비영속 상태
 //            Member member = new Member();
-//            member.setId(2L);
-//            member.setName("hellojpa");
+//            member.setId(101L);
+//            member.setName("hellojpa2");
+//
+//            //영속 상태로 전환
+//            System.out.println("=== BEFORE ===");
 //            em.persist(member);
+//            System.out.println("=== AFTER ===");
 
-            List<Member> result  = em.createQuery("select m from Member as m", Member.class).getResultList();
 
-            for (Member member : result) {
-                System.out.println("member name = " + member.getName());
-            }
+//            Member findMember1 = em.find(Member.class, 101L);
+//            Member findMember2 = em.find(Member.class, 101L);  //이미 1차 캐시에 있는애를 반환
+//
 
-//            em.remove(findMember);
+
+//            System.out.println("findMember.id = " + findMember.getId());
+//            System.out.println("findMember.name = " + findMember.getName());
+
+
+
+            //영속
+//            Member member1 = new Member(150L, "A");
+//            Member member2 = new Member(160L, "B");
+//
+//            em.persist(member1);  //1차 캐시와 쓰기지연 SQL 저장소에 저장
+//            em.persist(member2);  //1차 캐시와 쓰기지연 SQL 저장소에 저장
+
+
+            Member member = em.find(Member.class, 150L);
+//            member.setName("AAAA");
+
+//            em.detach(member);
+
+
+//            em.flush();
+
+            System.out.println("============");
+
 
             tx.commit();  // 트랜잭션 커밋
 
