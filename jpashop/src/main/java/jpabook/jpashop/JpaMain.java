@@ -1,10 +1,10 @@
-package hellojpa;
+package jpabook.jpashop;
+
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
-import java.util.List;
 
 public class JpaMain {
 
@@ -22,12 +22,8 @@ public class JpaMain {
 
         try {
 
-            Member member = new Member();
-//            member.setId(1L);
-            member.setUsername("A");
-            member.setRoleType(RoleType.USER);
 
-            em.persist(member);
+//            em.persist(member);
 
             tx.commit();  // 트랜잭션 커밋
 
@@ -40,7 +36,6 @@ public class JpaMain {
         }
         emf.close();  // 엔티티 매니저 팩토리 종료
 
-        //System.out.println(1);
     }
 
 
