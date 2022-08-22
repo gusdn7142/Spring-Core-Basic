@@ -22,12 +22,39 @@ public class JpaMain {
 
         try {
 
-            Member member = new Member();
-//            member.setId(1L);
-            member.setUsername("A");
-            member.setRoleType(RoleType.USER);
+            //team 엔티티 생성 후 DB에 등록
+            Team team = new Team();
+            team.setName("TeamA");
+            em.persist(team);
 
+            //member 엔티티 생성 후 DB에 등록
+            Member member = new Member();
+            member.setUserName("member1");
+            member.setTeam(team);
             em.persist(member);
+
+            em.flush();
+            em.clear();
+
+            Team findTeam = em.find(Team.class, team.getId());
+            List<Member> members = findTeam.getMembers();
+
+            for (Member member1 : members) {
+                System.out.println("m = " + member.getUserName());
+            }
+
+//            Member findMember = em.find(Member.class, member.getId());
+//            List<Member> members = findMember.getTeam().getMembers();
+//
+//            for (Member member1 : members) {
+//                System.out.println("m = " + member.getUserName());
+//            }
+
+
+//            System.out.println(findMember.getTeam().getName());
+
+            //Team findTeam = em.find(Team.class,findMember.getTeamId());
+
 
             tx.commit();  // 트랜잭션 커밋
 
