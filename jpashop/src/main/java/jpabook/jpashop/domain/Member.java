@@ -4,6 +4,8 @@ package jpabook.jpashop.domain;
 import net.bytebuddy.dynamic.loading.InjectionClassLoader;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -25,7 +27,8 @@ public class Member {
 
     private String zipcode;
 
-
+    @OneToMany(mappedBy = "member")    //mappedBy : 연관관계의 주인 설정
+    private List<Order> orders = new ArrayList<Order>();
 
 
 
