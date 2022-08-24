@@ -16,8 +16,9 @@ public class Team {   //부모 클래스
     private String name;
 
 
-    @OneToMany(mappedBy = "team")                    //mappedBy를 통해 어떤거와 매핑되어 있는지를 알려준다!
-    List<Member> members = new ArrayList<Member>();   //ArrayList를 사용하는것이 관례 (add할떄 Null 포인트를 막기 위함)
+    @OneToMany                   //mappedBy를 통해 어떤거와 매핑되어 있는지를 알려준다!
+    @JoinColumn(name = "TEAM_ID")
+    private List<Member> members = new ArrayList<Member>();   //ArrayList를 사용하는것이 관례 (add할떄 Null 포인트를 막기 위함)
 
 
 

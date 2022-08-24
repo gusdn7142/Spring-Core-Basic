@@ -22,26 +22,28 @@ public class JpaMain {
 
         try {
 
-            //team 엔티티 생성 후 DB에 등록
-            Team team = new Team();
-            team.setName("TeamA");
-            em.persist(team);
-
             //member 엔티티 생성 후 DB에 등록
             Member member = new Member();
             member.setUserName("member1");
-            member.setTeam(team);
+            //member.setTeam(team);
             em.persist(member);
 
-            em.flush();
-            em.clear();
+            //team 엔티티 생성 후 DB에 등록
+            Team team = new Team();
+            team.setName("TeamA");
+            team.getMembers().add(member);
 
-            Team findTeam = em.find(Team.class, team.getId());
-            List<Member> members = findTeam.getMembers();
+            em.persist(team);
 
-            for (Member member1 : members) {
-                System.out.println("m = " + member.getUserName());
-            }
+//            em.flush();
+//            em.clear();
+
+//            Team findTeam = em.find(Team.class, team.getId());
+//            List<Member> members = findTeam.getMembers();
+//
+//            for (Member member1 : members) {
+//                System.out.println("m = " + member.getUserName());
+//            }
 
 //            Member findMember = em.find(Member.class, member.getId());
 //            List<Member> members = findMember.getTeam().getMembers();
