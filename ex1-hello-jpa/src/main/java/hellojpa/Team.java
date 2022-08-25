@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-public class Team {   //부모 클래스
+public class Team extends BaseEntity{   //부모 클래스
 
 
     @Id

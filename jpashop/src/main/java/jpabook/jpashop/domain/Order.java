@@ -8,7 +8,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "ORDERS")   //order가 예약어이기 때문에 s를 붙입니다.
-public class Order {
+public class Order extends BaseEntity  {
 
 
     @Id @GeneratedValue

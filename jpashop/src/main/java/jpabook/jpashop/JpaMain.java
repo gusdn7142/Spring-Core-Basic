@@ -2,6 +2,7 @@ package jpabook.jpashop;
 
 
 import com.sun.org.apache.xpath.internal.operations.Or;
+import jpabook.jpashop.domain.Book;
 import jpabook.jpashop.domain.Order;
 //import jpabook.jpashop.domain.OrderItem;
 
@@ -37,6 +38,11 @@ public class JpaMain {
 //            em.persist(orderItem);
 
 
+            Book book = new Book();
+            book.setName("JPA");
+            book.setAuthor("뎁스");
+
+            em.persist(book);
             tx.commit();  // 트랜잭션 커밋
 
         }
