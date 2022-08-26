@@ -21,17 +21,19 @@ public class Member extends BaseEntity {
 //    @Column(name = "TEAM_ID")
 //    private Long teamId;
 
-    @ManyToOne                     //하나의 팀이 여러명의 멤버를 가질 수 있음
+    @ManyToOne(fetch = FetchType.LAZY)                     //하나의 팀이 여러명의 멤버를 가질 수 있음
     @JoinColumn(name = "TEAM_ID") //join하는 컬럼은 TEAM_ID  Team을 TEAM_ID로 join
     private Team team;
 
-    @OneToOne
-    @JoinColumn(name = "LOCEKR_ID")
-    private Locker locker;
 
-    @ManyToMany
-    @JoinColumn(name = "MEMBER_PRODUCT")
-    private List<Product> products = new ArrayList<>();
+
+//    @OneToOne
+//    @JoinColumn(name = "LOCEKR_ID")
+//    private Locker locker;
+//
+//    @ManyToMany
+//    @JoinColumn(name = "MEMBER_PRODUCT")
+//    private List<Product> products = new ArrayList<>();
 
 
 
