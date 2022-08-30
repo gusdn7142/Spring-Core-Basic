@@ -9,7 +9,7 @@ import java.util.List;
 
 
 @Entity
-public class Member extends BaseEntity {
+public class Member {
 
     @Id @GeneratedValue
     @Column(name = "MEMBER_ID")
@@ -18,26 +18,29 @@ public class Member extends BaseEntity {
     @Column(name = "USERNAME")
     private String userName;
 
-//    @Column(name = "TEAM_ID")
-//    private Long teamId;
-
     @ManyToOne(fetch = FetchType.LAZY)                     //하나의 팀이 여러명의 멤버를 가질 수 있음
     @JoinColumn(name = "TEAM_ID") //join하는 컬럼은 TEAM_ID  Team을 TEAM_ID로 join
     private Team team;
 
+    //기간 : Period
+    @Embedded
+    private Period workPeriod;
 
+    //주소
+    @Embedded
+    private Address homeAddress;
 
-//    @OneToOne
-//    @JoinColumn(name = "LOCEKR_ID")
-//    private Locker locker;
-//
-//    @ManyToMany
-//    @JoinColumn(name = "MEMBER_PRODUCT")
-//    private List<Product> products = new ArrayList<>();
-
-
-
-
+    //주소
+//    @Embedded
+//    @AttributeOverrides({
+//            @AttributeOverride(name = "city",
+//                        column=@Column(name="WORK_CITY")),
+//            @AttributeOverride(name = "street",
+//                        column=@Column(name="WORK_STREET")),
+//            @AttributeOverride(name = "zipcode",
+//                        column=@Column(name="WORK_ZIPCODE"))
+//            })
+//    private Address workAddress;
 
 
     public Team getTeam() {
@@ -63,6 +66,23 @@ public class Member extends BaseEntity {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public Period getWorkPeriod() {
+        return workPeriod;
+    }
+
+    public void setWorkPeriod(Period workPeriod) {
+        this.workPeriod = workPeriod;
+    }
+
+
+    public Address getHomeAddress() {
+        return homeAddress;
+    }
+
+    public void setHomeAddress(Address homeAddress) {
+        this.homeAddress = homeAddress;
     }
 
 

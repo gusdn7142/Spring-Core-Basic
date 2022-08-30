@@ -6,6 +6,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
 import javax.persistence.Persistence;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -24,28 +25,27 @@ public class JpaMain {
         tx.begin();  // 트랜잭션 시작
 
         try {
-            Child child1 = new Child();
-            Child child2 = new Child();
+            Address address = new Address("city", "street", "10000");
 
-            Parent parent = new Parent();
-            parent.addChild(child1);
-            parent.addChild(child2);
+            Member member = new Member();
+            member.setUserName("member1");
+            member.setHomeAddress(address);
+            em.persist(member);
 
-
-            em.persist(parent);
-            em.persist(child1);
-            em.persist(child2);
-
-            em.flush();
-            em.clear();
-
-            Parent findParent = em.find(Parent.class, parent.getId());
-            em.remove(findParent);
-
-//            findParent.getChildList().remove(0);
+            Address newAddress = new Address("newCity", address.getStreet(), address.getZipcode());
+            //member.setHomeAddress(newAddress);
 
 
 
+//            Address copyAdress =  new Address(address.getCity(), address.getStreet(), address.getZipcode());
+//
+//            Member member2 = new Member();
+//            member2.setUserName("member2");
+//            member2.setHomeAddress(copyAdress);
+//            em.persist(member2);
+//
+//
+//            member.getHomeAddress().setCity("new City");
 
             tx.commit();  // 트랜잭션 커밋
 
