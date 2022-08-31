@@ -42,6 +42,7 @@ public class JpaMain {
             book.setName("JPA");
             book.setAuthor("뎁스");
 
+
             em.persist(book);
             tx.commit();  // 트랜잭션 커밋
 
