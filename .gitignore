@@ -5,3 +5,7 @@ ex1-hello-jpa/pom.xml
 jpashop/src/main/resources/META-INF/persistence.xml
 jpashop/target/classes/META-INF/persistence.xml
 jpashop/pom.xml
+
+jpql/src/main/resources/META-INF/persistence.xml
+jpql/target/classes/META-INF/persistence.xml
+jpql/pom.xml
