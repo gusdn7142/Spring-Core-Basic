@@ -20,20 +20,50 @@ public class JpaMain {
         tx.begin();  // 트랜잭션 시작
 
         try {
+                Team team = new Team();
+                team.setName("teamA");
+                em.persist(team);
 
-            Member member = new Member();
-            member.setUsername("member1");
-            member.setAge(10);
-            em.persist(member);
+                Member member = new Member();
+                member.setUsername("member1");
+                member.setAge(10);
+                member.setTeam(team);
+                member.setType(MemberType.ADMIN);
+                em.persist(member);
 
 
+            em.flush();
+            em.clear();
 
-            List<MemberDTO> result = em.createQuery("select new Jpql.MemberDTO(m.username, m.age) from Member m", MemberDTO.class)
+            String query = "select m.username, 'HELLP', TRUE from Member m where m.type = :userType";
+            List<Object[]> result = em.createQuery(query)
+                    .setParameter("userType",MemberType.ADMIN)
                     .getResultList();
 
-            MemberDTO memberDTO = result.get(0);
-            System.out.println("username = " + memberDTO.getUsername());
-            System.out.println("age = " + memberDTO.getAge());
+            for (Object[] objects : result) {
+                System.out.println("objects = " + objects[0]);
+                System.out.println("objects = " + objects[1]);
+                System.out.println("objects = " + objects[2]);
+            }
+
+
+//            for (Member member1 : result) {
+//                System.out.println("member1 = " + member1);
+//            }
+
+
+
+
+
+
+
+
+//            List<MemberDTO> result = em.createQuery("select new Jpql.MemberDTO(m.username, m.age) from Member m", MemberDTO.class)
+//                    .getResultList();
+//
+//            MemberDTO memberDTO = result.get(0);
+//            System.out.println("username = " + memberDTO.getUsername());
+//            System.out.println("age = " + memberDTO.getAge());
 
 
 
