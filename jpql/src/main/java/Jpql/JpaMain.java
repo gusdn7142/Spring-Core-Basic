@@ -26,16 +26,21 @@ public class JpaMain {
 
                 Member member = new Member();
                 member.setUsername("member1");
-                member.setAge(10);
-                member.setTeam(team);
-                member.setType(MemberType.ADMIN);
+                //member.setAge(10);
+                //member.setTeam(team);
+                //member.setType(MemberType.ADMIN);
                 em.persist(member);
+
+
+                Member member2 = new Member();
+                member2.setUsername("member2");
+                em.persist(member2);
 
 
             em.flush();
             em.clear();
 
-            String query = "select coalesce(m.username,'이름 없는 회원') from Member m";
+            String query = "select function('group_concat',m.username) from Member m";   //group_concat(m.username) 도가능
             List<String> result = em.createQuery(query,String.class)
                     .getResultList();
 
