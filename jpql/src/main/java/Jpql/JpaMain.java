@@ -49,12 +49,13 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-            String query = "select m from Member m join fetch m.team";
-            List<Member> result = em.createQuery(query,Member.class)
+            String query = "select m from Member m where m.team = :team";
+            List<Member> members = em.createQuery(query,Member.class)
+                    .setParameter("team",member1.getTeam())
                     .getResultList();
 
-            for (Member member : result) {
-                System.out.println("member = " + member.getUsername() + ", " + member.getTeam().getName());
+            for (Member member : members) {
+                System.out.println("member = " + member);
             }
 
 

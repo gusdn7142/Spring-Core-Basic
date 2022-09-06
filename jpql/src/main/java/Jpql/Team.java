@@ -1,6 +1,7 @@
 package Jpql;
 
 
+import org.hibernate.annotations.BatchSize;
 import sun.dc.pr.PRError;
 
 import javax.persistence.Entity;
@@ -19,6 +20,7 @@ public class Team {
 
     private String name;
 
+    @BatchSize(size=100)
     @OneToMany(mappedBy = "team")
     private List<Member> members = new ArrayList<Member>();
 
