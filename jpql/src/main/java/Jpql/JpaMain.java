@@ -49,14 +49,21 @@ public class JpaMain {
             em.flush();
             em.clear();
 
-            String query = "select m from Member m where m.team = :team";
-            List<Member> members = em.createQuery(query,Member.class)
-                    .setParameter("team",member1.getTeam())
-                    .getResultList();
+            int resultCount = em.createQuery("update Member m set m.age = 20" )
+                    .executeUpdate();
+            System.out.println("resultCount = " + resultCount);
 
-            for (Member member : members) {
-                System.out.println("member = " + member);
-            }
+
+
+
+//            //String query = "select m from Member m where m.team = :team";
+//            List<Member> members = em.createNamedQuery("Member.findByUserName",Member.class)
+//                    .setParameter("username","member1")
+//                    .getResultList();
+//
+//            for (Member member : members) {
+//                System.out.println("member = " + member);
+//            }
 
 
 //            String query = "select t from Team t join fetch t.members";

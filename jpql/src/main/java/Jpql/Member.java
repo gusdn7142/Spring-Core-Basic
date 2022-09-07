@@ -3,7 +3,14 @@ package Jpql;
 import javax.persistence.*;
 import java.util.logging.SimpleFormatter;
 
+
+
+
 @Entity
+@NamedQuery(
+        name = "Member.findByUserName",
+        query = "select m from Member m where m.username = :username"
+)
 public class Member {
 
     @Id
