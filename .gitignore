@@ -9,3 +9,16 @@ jpashop/pom.xml
 jpql/src/main/resources/META-INF/persistence.xml
 jpql/target/classes/META-INF/persistence.xml
 jpql/pom.xml
+
+
+
+queridsl/.gradle
+queridsl/build
+queridsl/gradle
+queridsl/out
+queridsl/HELP.md
+queridsl/build.gradle
+queridsl/gradlew
+queridsl/gradlew.bat
+queridsl/settings.gradle
+queridsl/resources
