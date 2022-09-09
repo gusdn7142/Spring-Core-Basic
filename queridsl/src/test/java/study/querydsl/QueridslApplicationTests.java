@@ -5,6 +5,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.entity.Hello;
 import study.querydsl.entity.QHello;
@@ -14,7 +15,8 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.criteria.From;
 
 @SpringBootTest
-@Transactional   //트랜잭션 (+커밋) 설정
+@Transactional  //트랜잭션 (default로 롤백을 한다.)
+@Commit          //트랜잭션 커밋 (@Transactional의 롤백을 막기 위해 필요)
 class QueridslApplicationTests {
 
 	//@Autowired
