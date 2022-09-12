@@ -21,4 +21,4 @@ queridsl/build.gradle
 queridsl/gradlew
 queridsl/gradlew.bat
 queridsl/settings.gradle
-queridsl/resources
+queridsl/src/main/resources
