@@ -8,6 +8,7 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.Commit;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -21,6 +22,7 @@ import static study.querydsl.entity.QMember.member;
 
 @SpringBootTest
 @Transactional
+@Commit
 public class QuerydslBasicTest {
 
 
@@ -139,6 +141,75 @@ public class QuerydslBasicTest {
                 .fetchCount();
 
     }
+
+    /**
+     * 회원 정렬 순서
+     * 1. 회원 나이 : 내림차순(desc)
+     * 2. 회원 이름 : 올림차순 (asc)
+     * 단 2에서 회원 이름이 없으면 마지막에 출력 (nulls last)
+     */
+    @Test
+    public void sort(){
+        em.persist(new Member(null, 100));
+        em.persist(new Member("member5", 100));
+        em.persist(new Member("member6", 100));
+
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .where(member.age.eq(100))   //age가 100인 레코드 조회
+                .orderBy(member.age.desc(), member.username.asc().nullsLast())  //정렬 : 나이는 내림차순, 유저이름은 오름차순으로 정렬
+                .fetch();
+
+        Member member5 = result.get(0);
+        Member member6 = result.get(1);
+        Member memberNull = result.get(2);
+        assertThat(member5.getUsername()).isEqualTo("member5");
+        assertThat(member6.getUsername()).isEqualTo("member6");
+        assertThat(memberNull.getUsername()).isNull();
+
+    }
+
+    /**
+     * 페이징
+     * 1. 조회 건수 제한
+     */
+    @Test
+    public void paging1() {
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .orderBy(member.username.desc())
+                .offset(1)    //0부터 시작    (zero index)
+                .limit(2)     //최대 2건 조회 (size)
+                .fetch();
+        assertThat(result.size()).isEqualTo(2);
+    }
+
+
+    /**
+     * 페이징
+     * 2. 조회 건수 제한 + 전체 조회 수도 확인
+     */
+    @Test
+    public void paging2() {
+        QueryResults<Member> queryResults = queryFactory
+                .selectFrom(member)
+                .orderBy(member.username.desc())
+                .offset(1)    //0부터 시작    (zero index)
+                .limit(2)     //최대 2건 조회 (size)
+                .fetchResults();
+        assertThat(queryResults.getTotal()).isEqualTo(4);   //전체 레코드 개수 (count)
+        assertThat(queryResults.getLimit()).isEqualTo(2);   //offset은 1, size는 2이기 때문에  idx가 5번, 4번인 레코드가 출력됨
+        assertThat(queryResults.getOffset()).isEqualTo(1);  //offset은 1
+        assertThat(queryResults.getResults().size()).isEqualTo(2);   //idx가 5번, 4번 2개이기 때문에 size도 2이다.
+    }
+
+
+
+
+
+
+
+
 
 
 
