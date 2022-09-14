@@ -2,6 +2,8 @@ package study.querydsl.entity;
 
 
 import com.querydsl.core.QueryResults;
+import com.querydsl.core.Tuple;
+import com.querydsl.core.group.GroupBy;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import org.assertj.core.api.Assertions;
@@ -18,6 +20,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static study.querydsl.entity.QMember.member;
+import static study.querydsl.entity.QTeam.team;
 
 
 @SpringBootTest
@@ -203,6 +206,148 @@ public class QuerydslBasicTest {
         assertThat(queryResults.getResults().size()).isEqualTo(2);   //idx가 5번, 4번 2개이기 때문에 size도 2이다.
     }
 
+
+    /**
+     * JPQL
+     * select
+     * COUNT(m), //회원수
+     * SUM(m.age), //나이 합
+     * AVG(m.age), //평균 나이
+     * MAX(m.age), //최대 나이
+     * MIN(m.age) //최소 나이
+     * from Member m
+     */
+    @Test
+    public void aggregation() throws Exception {
+        List<Tuple> result = queryFactory
+                .select(member.count(),      //회원 레코드 수
+                        member.age.sum(),   //나이 총합
+                        member.age.avg(),   //평균 나이
+                        member.age.max(),    //최대 나이
+                        member.age.min())   //최소 나이
+                .from(member)
+                .fetch();
+
+        Tuple tuple = result.get(0);
+
+        assertThat(tuple.get(member.count())).isEqualTo(4);
+        assertThat(tuple.get(member.age.sum())).isEqualTo(100);
+        assertThat(tuple.get(member.age.avg())).isEqualTo(25);
+        assertThat(tuple.get(member.age.max())).isEqualTo(40);
+        assertThat(tuple.get(member.age.min())).isEqualTo(10);
+
+    }
+
+
+    /**
+     * 팀의 이름과 각 팀의 평균 연령을 구해라.
+     */
+    @Test
+    public void group() throws Exception {
+        List<Tuple> result = queryFactory
+                .select(team.name, member.age.avg())
+                .from(member)
+                .join(member.team, team)   //join(target, alias)
+                .groupBy(team.name)
+                .fetch();
+
+        Tuple teamA = result.get(0);
+        Tuple teamB = result.get(1);
+
+        assertThat(teamA.get(team.name)).isEqualTo("teamA");
+        assertThat(teamA.get(member.age.avg())).isEqualTo(15);
+        assertThat(teamB.get(team.name)).isEqualTo("teamB");
+        assertThat(teamB.get(member.age.avg())).isEqualTo(35);
+    }
+
+
+
+
+    /**
+     * 기본 조인 : 팀 A에 소속된 모든 회원
+     */
+    @Test
+    public void join() throws Exception {
+        QMember member = QMember.member;
+        QTeam team = QTeam.team;
+
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .join(member.team, team)           //join(조인 대상, 별칭으로 사용할 Q타입)
+                .where(team.name.eq("teamA")) //team의 이름이 "teamA"인 레코드만 조회
+                .fetch();
+
+        assertThat(result)
+                .extracting("username")    //검증할 필드 지정
+                .containsExactly("member1", "member2"); //containsExactly: 순서를 포함해서 원소가 정확히 일치하는지 확인
+    }
+
+    /**
+     * 세타 조인 (연관관계가 없는 필드로 조인)
+     * 회원의 이름이 팀 이름과 같은 회원 조회
+     */
+    @Test
+    public void theta_join() throws Exception {
+        em.persist(new Member("teamA"));  //member 객체 생성시 이름을 임의로 "teamA"로 생성
+        em.persist(new Member("teamB"));
+
+        List<Member> result = queryFactory
+                .select(member)
+                .from(member, team)
+                .where(member.username.eq(team.name))
+                .fetch();
+
+        assertThat(result)
+                .extracting("username")   //검증할 필드 지정
+                .containsExactly("teamA", "teamB");   //containsExactly: 순서를 포함해서 원소가 정확히 일치하는지 확인
+
+    }
+
+
+
+    /**
+     * 1. 조인 대상 필터링
+     * 예) 회원과 팀을 조인하면서, 팀 이름이 teamA인 팀만 조인, 회원은 모두 조회
+     * JPQL: SELECT m, t FROM Member m LEFT JOIN m.team t on t.name = 'teamA'
+     * SQL: SELECT m.*, t.* FROM Member m LEFT JOIN Team t ON m.TEAM_ID=t.id and t.name='teamA'
+     */
+    @Test
+    public void join_on_filtering() throws Exception {
+        List<Tuple> result = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(member.team, team).on(team.name.eq("teamA"))
+                //.where(team.name.eq("teamA"))
+                .fetch();
+
+        for (Tuple tuple : result) {
+            System.out.println("tuple = " + tuple);
+        }
+
+    }
+
+
+    /**
+     * 2. 연관관계 없는 엔티티 외부 조인
+     * 예) 회원의 이름과 팀의 이름이 같은 대상 외부 조인
+     * JPQL: SELECT m, t FROM Member m LEFT JOIN Team t on m.username = t.name
+     * SQL: SELECT m.*, t.* FROM Member m LEFT JOIN Team t ON m.username = t.name
+     */
+    @Test
+    public void join_on_no_relation() throws Exception {
+        em.persist(new Member("teamA"));
+        em.persist(new Member("teamB"));
+
+        List<Tuple> result = queryFactory
+                .select(member, team)
+                .from(member)
+                .leftJoin(team).on(member.username.eq(team.name))  //leftJoin의 대상이 member.team이 아닌 team이기 때문에  leftOuterJoin()으로 바뀌어서 이제 id로 join 되지 않고 on 절로만 join된다.
+                .fetch();
+
+        for (Tuple tuple : result) {
+            System.out.println("t=" + tuple);
+        }
+    }
 
 
 
