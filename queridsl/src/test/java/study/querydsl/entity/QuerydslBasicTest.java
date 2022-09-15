@@ -4,6 +4,10 @@ package study.querydsl.entity;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.group.GroupBy;
+import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
+import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import org.assertj.core.api.Assertions;
@@ -13,7 +17,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.Commit;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceUnit;
 import javax.transaction.Transactional;
 
 import java.util.List;
@@ -28,6 +34,8 @@ import static study.querydsl.entity.QTeam.team;
 @Commit
 public class QuerydslBasicTest {
 
+    @PersistenceUnit
+    EntityManagerFactory emf;
 
     @PersistenceContext
     EntityManager em;
@@ -349,8 +357,211 @@ public class QuerydslBasicTest {
         }
     }
 
+    /**
+     * 페치 조인 미적용
+     */
+    @Test
+    public void fetchJoinNo() throws Exception {
+        em.flush();
+        em.clear();
+
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .where(member.username.eq("member1"))
+                .fetchOne();
 
 
+        boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
+        assertThat(loaded).as("페치 조인 미적용").isFalse();
+    }
+
+
+    /**
+     * 페치 조인 적용
+     */
+    @Test
+    public void fetchJoinUse() throws Exception {
+        em.flush();
+        em.clear();
+
+        Member findMember = queryFactory
+                .selectFrom(member)
+                .join(member.team, team).fetchJoin()
+                .where(member.username.eq("member1"))
+                .fetchOne();
+
+        boolean loaded = emf.getPersistenceUnitUtil().isLoaded(findMember.getTeam());
+        assertThat(loaded).as("페치 조인 적용").isTrue();
+    }
+
+
+    /**
+     * 나이가 가장 많은 회원 조회
+     */
+    @Test
+    public void subQuery() throws Exception {
+        QMember memberSub = new QMember("memberSub");  //서브쿼리에서 사용하기 위해 생성
+
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .where(member.age.eq(
+                        JPAExpressions
+                                .select(memberSub.age.max())   //서브쿼리 (나이가 가장 많은 사람의 나이 조회)
+                                .from(memberSub)
+                ))
+                .fetch();
+
+
+        assertThat(result).extracting("age").containsExactly(40);
+    }
+
+
+
+    /**
+     * 나이가 평균 나이 이상인 회원
+     */
+    @Test
+    public void subQueryGoe() throws Exception {
+        QMember memberSub = new QMember("memberSub");  //서브쿼리에서 사용하기 위해 생성
+
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .where(member.age.goe(  //goe : >=
+                        JPAExpressions
+                                .select(memberSub.age.avg())   //서브쿼리 (평균 나이 조회)
+                                .from(memberSub)
+                ))
+                .fetch();
+
+        assertThat(result).extracting("age").containsExactly(30,40);
+    }
+
+
+
+    /**
+     * 서브쿼리 여러 건 처리, in 사용
+     */
+    @Test
+    public void subQueryIn() throws Exception {
+        QMember memberSub = new QMember("memberSub");  //서브쿼리에서 사용하기 위해 생성
+
+        List<Member> result = queryFactory
+                .selectFrom(member)
+                .where(member.age.in(    //== 여러개
+                        JPAExpressions
+                                .select(memberSub.age)     //서브쿼리 (나이가 10보다 큰 회원의 나이 조회)
+                                .from(memberSub)
+                                .where(memberSub.age.gt(10))   // >
+                ))
+                .fetch();
+
+        assertThat(result).extracting("age").containsExactly(20, 30, 40);
+    }
+
+
+    /**
+     * select 절에 subquery
+     */
+    @Test
+    public void selectSubQueryIn() throws Exception {
+        QMember memberSub = new QMember("memberSub");  //서브쿼리에서 사용하기 위해 생성
+
+        List<Tuple> fetch = queryFactory
+                .select(member.username,
+                        JPAExpressions
+                                .select(memberSub.age.avg())   //서브 쿼리 (평균 나이 조회)
+                                .from(memberSub)
+                ).from(member)
+                .fetch();
+
+        for (Tuple tuple : fetch) {
+            System.out.println("username = " + tuple.get(member.username));   //이름 출력
+            System.out.println("age = " +
+                    tuple.get(JPAExpressions.select(memberSub.age.avg())   //평균 나이 출력
+                            .from(memberSub)));
+        }
+    }
+
+
+
+    /**
+     * Case 문 - 단순한 조건
+     */
+    @Test
+    public void basicCase(){
+
+        List<String> result = queryFactory
+                .select(member.age
+                        .when(10).then("열살")
+                        .when(20).then("스무살")
+                        .otherwise("기타"))
+                .from(member)
+                .fetch();
+
+        for (String s : result) {
+            System.out.println("s = " + s);
+        }
+
+    }
+
+
+
+    /**
+     * Case 문 - 복잡한 조건
+     */
+    @Test
+    public void Case2(){
+
+        List<String> result = queryFactory
+                .select(new CaseBuilder()      //case-when-then-else
+                        .when(member.age.between(0, 20)).then("0~20살")
+                        .when(member.age.between(21, 30)).then("21~30살")
+                        .otherwise("기타"))
+                .from(member)
+                .fetch();
+
+        for (String s : result) {
+            System.out.println("s = " + s);
+        }
+
+
+    }
+
+
+    /**
+     * 상수 사용
+     */
+    @Test
+    public void constant(){
+
+        List<Tuple> result = queryFactory
+                .select(member.username, Expressions.constant("A"))
+                .from(member)
+                .fetch();
+
+        for (Tuple tuple : result) {
+            System.out.println("tuple = " + tuple);
+        }
+
+    }
+
+
+    /**
+     * 문자 더하기
+     */
+    @Test
+    public void concat(){
+
+        List<String> result = queryFactory
+                .select(member.username.concat("_").concat(member.age.stringValue()))  //age를 문자열 타입으로 변환
+                .from(member)
+                .where(member.username.eq("member1"))
+                .fetch();
+
+        for (String s : result) {
+            System.out.println("s = " + s);
+        }
+    }
 
 
 
