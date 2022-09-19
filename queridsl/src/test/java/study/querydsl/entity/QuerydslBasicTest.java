@@ -1,11 +1,13 @@
 package study.querydsl.entity;
 
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.QueryResults;
 import com.querydsl.core.Tuple;
 import com.querydsl.core.group.GroupBy;
 import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberExpression;
@@ -734,6 +736,200 @@ public class QuerydslBasicTest {
         }
     }
 
+
+
+
+    /**
+     * Querydsl에서 동적쿼리 사용 - BooleanBuilder
+     */
+    @Test
+    public void 동적쿼리_BooleanBuilder() throws Exception {
+
+        String usernameParam = "member1";  //uerename 파라미터
+        Integer ageParam = 10;             //age 파라미터
+
+        List<Member> result = searchMember1(usernameParam, ageParam);  //조건에 따른 member 조회 함수
+        Assertions.assertThat(result.size()).isEqualTo(1);   //Member객체의 사이즈 (레코드 수)
+
+
+    }
+
+    //조건에 따른 member 조회 함수
+    private List<Member> searchMember1(String usernameParam, Integer ageParam) {
+
+        BooleanBuilder builder = new BooleanBuilder();   //where절 초기값 부여도 가능 : new BooleanBuilder(member.username.eq(usernameCond))
+
+        if (usernameParam != null) {                         //usernameCond null이 아니면
+            builder.and(member.username.eq(usernameParam));  //username 필드가 usernameCond와 같은지 비교
+        }
+        if (ageParam != null) {                             //ageCond null이 아니면
+            builder.and(member.age.eq(ageParam));            //age 필드가 ageCond와 같은지 비교
+        }
+        return queryFactory
+                .selectFrom(member)   //member 객체 조회
+                .where(builder)       //builder에 포함된 where절이 들어감. (ex, username필드와 age 필드)... bulider 다음에 and로 조건 추가도 가능!!!
+                .fetch();
+    }
+
+
+
+
+    /**
+     * Querydsl에서 동적쿼리 사용 - Where 다중 파라미터 사용
+     */
+    @Test
+    public void 동적쿼리_WhereParam() throws Exception {
+
+        String usernameParam = "member1";
+        Integer ageParam = 10;
+
+
+        List<Member> result = searchMember2(usernameParam, ageParam);  //조건에 따른 member 조회 함수
+        Assertions.assertThat(result.size()).isEqualTo(1);
+    }
+
+    //조건에 따른 member 조회 함수
+    private List<Member> searchMember2(String usernameParam, Integer ageParam) {
+
+        return queryFactory       //member 객체 조회
+                .selectFrom(member)
+                .where(usernameEq(usernameParam), ageEq(ageParam))
+                //.where(allEq(usernameParam, ageParam))
+                .fetch();
+    }
+
+    //where절에 사용할 username 필드 비교 메서드
+    private BooleanExpression usernameEq(String usernameParam) {
+        //if(usernameParam == null){
+          //  return null;
+        //}
+        //return member.username.eq(usernameParam)
+        return usernameParam != null ? member.username.eq(usernameParam) : null;   //null일 경우를 고려한 삼항연산
+    }
+
+    //where절에 사용할 age 필드 비교 메서드
+    private BooleanExpression ageEq(Integer ageParam) {
+        //if(ageParam == null){
+        //  return null;
+        //}
+        //return member.age.eq(ageParam)
+        return ageParam != null ? member.age.eq(ageParam) : null;   //null일 경우를 고려한 삼항연산
+    }
+
+    //where절에 사용할 username 필드와  age 필드 비교 조합 메서드....  조합 가능!!!
+    //private BooleanExpression allEq(String usernameParam, Integer ageParam) {
+    //    return usernameEq(usernameParam).and(ageEq(ageParam));
+    //}
+
+
+
+
+
+    /**
+     * Querydsl에서 수정, 삭제 벌크 연산 - 쿼리 한번으로 대량 데이터 수정
+     */
+    @Test
+    public void bulkUpdate(){
+
+        //영속성 컨텍스트 값
+        //member1.age = 10 -> DB member1
+        //member2.age = 20 -> DB member2
+        //member3.age = 30 -> DB member3
+        //member4.age = 40 -> DB member4
+
+        long count = queryFactory
+                .update(member)
+                .set(member.username, "비회원")   //username을 "비회원"으로 변경
+                .where(member.age.lt(28))   //age<28이면
+                .execute();
+
+        //영속성 컨텍스트 값       //Update 쿼리시의 변경사항을 영속성 컨텍스트에 저장하지 않는다!!!
+        //member1.age = 10 -> DB member1
+        //member2.age = 20 -> DB member2
+        //member3.age = 30 -> DB member3
+        //member4.age = 40 -> DB member4
+
+        em.flush();
+        em.clear();
+
+        List<Member> result = queryFactory   //member 객체 조회시 이미 member객체가 영속성 컨텍스트에 있으면 DB에서 조회한 값을 버린다.
+               .selectFrom(member)
+                .fetch();
+
+        for (Member member1 : result) {
+            System.out.println("member1 = " + member1);  //member 객체 출력
+        }
+
+    }
+
+
+
+    /**
+     * Querydsl에서 수정, 삭제 벌크 연산 - 기존 숫자에 1 더하기
+     */
+    @Test
+    public void bulkAdd() {
+        long count = queryFactory
+                .update(member)
+                .set(member.age, member.age.add(1))   // member.age.multiply(x) : 곱하기
+                .execute();
+    }
+
+
+    /**
+     * Querydsl에서 수정, 삭제 벌크 연산 - 쿼리 한번으로 대량 데이터 삭제
+     */
+    @Test
+    public void bulkDelete() {
+
+        long count = queryFactory
+                .delete(member)
+                .where(member.age.gt(18))  //age>18
+                .execute();
+
+    }
+
+
+    /**
+     * Querydsl에서 SQL function 호출 - username 필드의 문자열을 다른 문자열로 변경하여 조회
+     */
+    @Test
+    public void sqlFunction() {
+
+        List<String> result = queryFactory
+                .select(Expressions.stringTemplate(   //username에서 "member" 문자열을 M으로 변경
+                        "function('replace', {0}, {1}, {2})",
+                        member.username, "member", "M"))
+                .from(member)
+                .fetch();
+
+        for(String s : result) {
+            System.out.println("s = " + s);  //M1.. M2.. M3.. M4..
+        }
+    }
+
+
+    /**
+     * Querydsl에서 SQL function 호출 - 소문자인 username만 비교하여 username필드 조회
+     */
+    @Test
+    public void sqlFunction2() {
+
+        List<String> result = queryFactory
+                .select(member.username)
+                .from(member)
+                .where(member.username.eq(Expressions.stringTemplate(
+                        "function('lower', {0})",
+                        member.username)))
+                //.where(member.username.eq(member.username.lower()))  //upper는 대문자!!
+                .fetch();
+
+        for (String s : result) {
+            System.out.println("s = " + s);
+        }
+
+
+    }
 
 
 
