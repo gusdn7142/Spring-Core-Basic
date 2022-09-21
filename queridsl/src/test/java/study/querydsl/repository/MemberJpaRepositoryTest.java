@@ -9,6 +9,7 @@ import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.dto.MemberSearchParam;
 import study.querydsl.dto.MemberTeamDto;
+import study.querydsl.dto.QMemberTeamDto;
 import study.querydsl.entity.Member;
 import study.querydsl.entity.Team;
 
@@ -16,6 +17,8 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static study.querydsl.entity.QMember.member;
+import static study.querydsl.entity.QTeam.team;
 
 
 @SpringBootTest
@@ -101,11 +104,14 @@ class MemberJpaRepositoryTest {
         param.setTeamName("teamB");
 
         //param 조건을  BooleanBuilder에 넣어 Member 객체를 select한 결과를 MemberTeamDto객체로 반환
-        List<MemberTeamDto> result = memberJpaRepository.searchByBuilder(param);
+        List<MemberTeamDto> result = memberJpaRepository.search(param);  //searchByBuilder(param);
 
         assertThat(result).extracting("username").containsExactly("member4");
 
     }
+
+
+
 
 
 
