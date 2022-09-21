@@ -10,7 +10,7 @@ jpql/src/main/resources/META-INF/persistence.xml
 jpql/target/classes/META-INF/persistence.xml
 jpql/pom.xml
 
-queridsl/src/test/resources/application.yml
+queridsl/src/test/resources
 
 queridsl/.gradle
 queridsl/build
