@@ -3,6 +3,8 @@ package study.querydsl.repository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import study.querydsl.dto.MemberSearchParam;
@@ -11,6 +13,7 @@ import study.querydsl.entity.Member;
 import study.querydsl.entity.Team;
 
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
 import java.util.List;
 
@@ -22,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Commit
 class MemberRepositoryTest {
 
-    @Autowired
+    @PersistenceContext //Bean 등록
     EntityManager em;
 
     @Autowired
@@ -84,6 +87,72 @@ class MemberRepositoryTest {
         assertThat(result).extracting("username").containsExactly("member4");
 
     }
+
+
+
+    //단순한 페이징, fetchResults() 사용 : 데이터 내용과 전체 카운트를 한번에 조회하는 테스트
+    @Test
+    public void searchPageSimpleTest() {
+
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+
+        em.persist(teamA);
+        em.persist(teamB);
+
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 20, teamA);
+        Member member3 = new Member("member3", 30, teamB);
+        Member member4 = new Member("member4", 40, teamB);
+
+        em.persist(member1);
+        em.persist(member2);
+        em.persist(member3);
+        em.persist(member4);
+
+        //where절 함수(파라미터)에 사용할 조건값 셋팅
+        MemberSearchParam param = new MemberSearchParam();         //RequestDTO
+        PageRequest pageRequest = PageRequest.of(0,3);  //페이지 생성,  index=0. size=3
+
+        //param 조건을  where절 함수(파라미터)에 넣어 Member 객체를 select한 결과를 MemberTeamDto객체로 반환
+        Page<MemberTeamDto> result = memberRepository.searchPageSimple(param, pageRequest);     //페이징
+
+        assertThat(result.getSize()).isEqualTo(3);
+        assertThat(result.getContent()).extracting("username").containsExactly("member1","member2","member3");
+    }
+
+
+    //복잡한 페이징 - fetch()와 fetchCount() 사용 : 데이터 내용과 전체 카운트를 별도로 조회
+    @Test
+    public void searchPageComplex() {
+
+        Team teamA = new Team("teamA");
+        Team teamB = new Team("teamB");
+
+        em.persist(teamA);
+        em.persist(teamB);
+
+        Member member1 = new Member("member1", 10, teamA);
+        Member member2 = new Member("member2", 20, teamA);
+        Member member3 = new Member("member3", 30, teamB);
+        Member member4 = new Member("member4", 40, teamB);
+
+        em.persist(member1);
+        em.persist(member2);
+        em.persist(member3);
+        em.persist(member4);
+
+        //where절 함수(파라미터)에 사용할 조건값 셋팅
+        MemberSearchParam param = new MemberSearchParam();         //RequestDTO
+        PageRequest pageRequest = PageRequest.of(0,3);  //페이지 생성,  index=0. size=3
+
+        //param 조건을  where절 함수(파라미터)에 넣어 Member 객체를 select한 결과를 MemberTeamDto객체로 반환
+        Page<MemberTeamDto> result = memberRepository.searchPageComplex(param, pageRequest);     //페이징
+
+        assertThat(result.getSize()).isEqualTo(3);
+        assertThat(result.getContent()).extracting("username").containsExactly("member1","member2","member3");
+    }
+
 
 
 
