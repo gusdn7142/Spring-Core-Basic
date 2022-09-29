@@ -116,7 +116,7 @@ class MemberRepositoryTest {
         PageRequest pageRequest = PageRequest.of(0,3);  //페이지 생성,  index=0. size=3
 
         //param 조건을  where절 함수(파라미터)에 넣어 Member 객체를 select한 결과를 MemberTeamDto객체로 반환
-        Page<MemberTeamDto> result = memberRepository.searchPageSimple(param, pageRequest);     //페이징
+        Page<MemberTeamDto> result = memberRepository.searchPageSimple2(param, pageRequest);     //페이징
 
         assertThat(result.getSize()).isEqualTo(3);
         assertThat(result.getContent()).extracting("username").containsExactly("member1","member2","member3");
