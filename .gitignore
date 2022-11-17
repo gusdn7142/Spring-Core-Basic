@@ -22,3 +22,16 @@ queridsl/gradlew
 queridsl/gradlew.bat
 queridsl/settings.gradle
 queridsl/src/main/resources
+
+
+
+jdbc/.gradle
+jdbc/.idea
+jdbc/build/
+jdbc/gradle/
+jdbc/HELP.md
+jdbc/build.gradle
+jdbc/gradlew
+jdbc/gradlew.bat
+jdbc/settings.gradle
+jdbc/src/main/resources
