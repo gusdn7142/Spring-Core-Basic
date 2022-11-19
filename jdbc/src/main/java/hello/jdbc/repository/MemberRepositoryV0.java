@@ -41,6 +41,43 @@ public class MemberRepositoryV0 {
         }
     }
 
+    /**
+     * 2. 회원 조회 (MemberId 활용)
+     */
+    public Member findById(String memberId) throws SQLException {
+        String sql = "select * from member where member_id = ?";   //데이터베이스에 전달할 SQL을 정의
+
+        Connection con = null;            //Connection 객체
+        PreparedStatement pstmt = null;  //PreparedStatement 객체
+        ResultSet rs = null;             //ResultSet 객체
+
+        try {
+            //Connection을 먼저 획득하고 Connection을 통해 PreparedStatement 생성 후 DB에 전달하여 ResultSet에 결과 값 반환, ResultSet의 값을 member 객체에 셋팅하여 반환
+            con = getConnection();               //DB Connection 연결 및 조회
+            pstmt = con.prepareStatement(sql);   //sql로 PreparedStatement 객체 생성 : 데이터베이스에 전달할 SQL과 파라미터로 전달할 데이터들을 준비
+            pstmt.setString(1, memberId);   //SQL에서 첫번쨰 파라미터 바인딩
+
+            rs = pstmt.executeQuery();        //PreparedStatement 실행 : 준비된 SQL을 커넥션을 통해 실제 데이터베이스에 전달...  반환 값은 Select 쿼리의 결과이다.
+            if (rs.next()) {   //ResultSet 객체에서 Row 값을 하나씩 조회
+                Member member = new Member();
+                member.setMemberId(rs.getString("member_id"));  //ResultSet 객체에서 memberId 필드를 조회하여 member 객체에 셋팅
+                member.setMoney(rs.getInt("money"));  //ResultSet 객체에서 money 필드를 조회하여 member 객체에 셋팅
+                return member;                                    // member 객체 리턴
+            } else {
+                throw new NoSuchElementException("member not found memberId=" + memberId);  //ResultSet의 객체가 1개도 없다면
+            }
+
+        } catch (SQLException e) {
+            log.error("db error", e);
+            throw e;
+        } finally {
+            //리소스 정리 : 반환할 때는 PreparedStatement를 먼저 종료하고, 그 다음에 Connection을 종료...    리소스 정리는 필수입니다!!!
+            close(con, pstmt, rs);     //Connection과  PreparedStatement, ResultSet 연결 종료
+        }
+
+    }
+
+
 
     private void close(Connection con, Statement stmt, ResultSet rs) {  //ResultSet은 select 쿼리에서 사용됩니다.
 
