@@ -77,6 +77,62 @@ public class MemberRepositoryV0 {
 
     }
 
+    /**
+     * 3. 회원 정보 변경 함수
+     */
+    public void update(String memberId, int money) throws SQLException {
+        String sql = "update member set money=? where member_id=?";   //데이터베이스에 전달할 SQL을 정의
+
+        Connection con = null;            //Connection 객체 생성
+        PreparedStatement pstmt = null;   //PreparedStatement 객체 생성
+
+        try {
+            //Connection을 먼저 획득하고 Connection을 통해 PreparedStatement 생성 후 DB에 전달
+            con = getConnection();               //DB Connection 연결 및 조회
+            pstmt = con.prepareStatement(sql);   //sql로 PreparedStatement 객체 생성 : 데이터베이스에 전달할 SQL과 파라미터로 전달할 데이터들을 준비
+
+            pstmt.setInt(1, money);          //SQL에서 첫번쨰 파라미터 바인딩
+            pstmt.setString(2, memberId);   //SQL에서 두번쨰 파라미터 바인딩
+            int resultSize = pstmt.executeUpdate();      //PreparedStatement 실행 : 준비된 SQL을 커넥션을 통해 실제 데이터베이스에 전달...  반환 값은 영향받은 DB row 수 이다...
+
+            log.info("resultSize={}", resultSize);
+        } catch (SQLException e) {
+            log.error("db error", e);
+            throw e;
+        } finally {
+            //리소스 정리 : 반환할 때는 PreparedStatement를 먼저 종료하고, 그 다음에 Connection을 종료...    리소스 정리는 필수입니다!!!
+            close(con, pstmt, null);
+        }
+
+    }
+
+    /**
+     * 4. 회원 정보 삭제 함수
+     */
+    public void delete(String memberId) throws SQLException {
+        String sql = "delete from member where member_id=?";   //데이터베이스에 전달할 SQL을 정의
+
+        Connection con = null;            //Connection 객체 생성
+        PreparedStatement pstmt = null;   //PreparedStatement 객체 생성
+
+        try {
+            //Connection을 먼저 획득하고 Connection을 통해 PreparedStatement 생성 후 DB에 전달
+            con = getConnection();               //DB Connection 연결 및 조회
+            pstmt = con.prepareStatement(sql);   //sql로 PreparedStatement 객체 생성 : 데이터베이스에 전달할 SQL과 파라미터로 전달할 데이터들을 준비
+
+            pstmt.setString(1, memberId);          //SQL에서 첫번쨰 파라미터 바인딩
+            pstmt.executeUpdate();                             //PreparedStatement 실행 : 준비된 SQL을 커넥션을 통해 실제 데이터베이스에 전달...  반환 값은 영향받은 DB row 수 이다...
+        } catch (SQLException e) {
+            log.error("db error", e);
+            throw e;
+        } finally {
+            //리소스 정리 : 반환할 때는 PreparedStatement를 먼저 종료하고, 그 다음에 Connection을 종료...    리소스 정리는 필수입니다!!!
+            close(con, pstmt, null);
+        }
+
+    }
+
+
 
 
     private void close(Connection con, Statement stmt, ResultSet rs) {  //ResultSet은 select 쿼리에서 사용됩니다.
