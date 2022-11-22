@@ -1,5 +1,6 @@
 package hello.jdbc.connection;
 
+import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
@@ -36,6 +37,27 @@ public class ConnectionTest {
         DriverManagerDataSource dataSource = new DriverManagerDataSource(URL,USERNAME, PASSWORD);   //ConnectionConst의  URL, USERNAME, PASSWORD 상수를 가져와 h2 jdbc connection을 가진 DataSource 객체를 반환
         useDataSource(dataSource);
     }
+
+    //3. 스프링이 제공하는 DataSource가 적용된 HikariDataSource (커넥션 풀) 사용
+    @Test
+    void dataSourceConnectionPool() throws SQLException, InterruptedException {
+
+        //HikariDataSource(커넥션 풀)로 커넥션 연결
+        HikariDataSource dataSource = new HikariDataSource();    //HikariDataSource는 DataSource 인터페이스를 구현
+
+        dataSource.setJdbcUrl(URL);               //ConnectionConst의  URL 상수를 설정
+        dataSource.setUsername(USERNAME);         //ConnectionConst의  USERNAME 상수를 설정
+        dataSource.setPassword(PASSWORD);         //ConnectionConst의  PASSWORD 상수를 설정
+        dataSource.setMaximumPoolSize(10);   //커넥션 풀의 최대 사이즈 지정
+        dataSource.setPoolName("MyPool");    //커넥션 풀 이름 지정
+
+        //HikariDataSource(커넥션 풀)로 커넥션 획득
+        useDataSource(dataSource);
+
+
+        Thread.sleep(1000);   //대기 시간을 주어야 쓰레드 풀에 커넥션이 생성되는 로그 확인 가능...
+    }
+
 
 
 
