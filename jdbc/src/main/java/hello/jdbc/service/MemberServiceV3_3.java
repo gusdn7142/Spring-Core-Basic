@@ -23,7 +23,7 @@ public class MemberServiceV3_3 {
     }
 
     //계좌이체 함수 : 2명의 회원간에 돈 거래
-    @Transactional
+    @Transactional   //AOP 적용 대상이 되어 (트랜잭션) 프록시를 적용
     public void accountTransfer(String fromId, String toId, int money) throws SQLException {
 
         // 비즈니스 로직 수행 부분
