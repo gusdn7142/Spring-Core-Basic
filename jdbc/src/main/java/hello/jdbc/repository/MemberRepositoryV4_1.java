@@ -1,6 +1,7 @@
 package hello.jdbc.repository;
 
 import hello.jdbc.domain.Member;
+import hello.jdbc.repository.exception.MyDbException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.support.JdbcUtils;
@@ -11,18 +12,19 @@ import java.util.NoSuchElementException;
 
 
 /**
- * 트랜잭션 - 트랜잭션 매니저
- * DataSourceUtils.getConnection() : 커넥션 획득
- * DataSourceUtils.releaseConnection() : 커넥션 연결 종료 (+동기화된 커넥션은 그대로 유지)
+ * 예외 누수 문제 해결
+ * 체크 예외를 런타임 예외로 변경
+ * MemberRepository 인터페이스 사용
+ * throws SQLException 제거
  */
 @Slf4j
-public class MemberRepositoryV3 implements MemberRepositoryEx{
+public class MemberRepositoryV4_1 implements MemberRepository{
 
 
     private final DataSource dataSource;     //DataSource객체 생성
 
     //DataSource 의존관계 주입
-    public MemberRepositoryV3(DataSource dataSource) {
+    public MemberRepositoryV4_1(DataSource dataSource) {
         this.dataSource = dataSource;
     }
 
@@ -30,7 +32,8 @@ public class MemberRepositoryV3 implements MemberRepositoryEx{
     /**
      * 1. 회원 등록 함수
      */
-    public Member save(Member member) throws SQLException {
+    @Override
+    public Member save(Member member)  {  //throws SQLException
         String sql = "insert into member(member_id, money) values (?, ?)";   //데이터베이스에 전달할 SQL을 정의
 
         Connection con = null;            //Connection 객체
@@ -46,8 +49,8 @@ public class MemberRepositoryV3 implements MemberRepositoryEx{
             pstmt.executeUpdate();                            //PreparedStatement 실행 : 준비된 SQL을 커넥션을 통해 실제 데이터베이스에 전달...  반환 값은 영향받은 DB row 수 이다... (생략 가능)
             return member;
         } catch (SQLException e) {
-            log.error("db error", e);
-            throw e;
+            throw new MyDbException(e);
+            //log.error("db error", e);
         } finally {
             //리소스 정리 : 반환할 때는 PreparedStatement를 먼저 종료하고, 그 다음에 Connection을 종료...    리소스 정리는 필수입니다!!!
             close(con, pstmt, null);   //Connection과  PreparedStatement 연결 종료
@@ -57,7 +60,8 @@ public class MemberRepositoryV3 implements MemberRepositoryEx{
     /**
      * 2. 회원 조회 (MemberId 활용)
      */
-    public Member findById(String memberId) throws SQLException {
+    @Override
+    public Member findById(String memberId) {
         String sql = "select * from member where member_id = ?";   //데이터베이스에 전달할 SQL을 정의
 
         Connection con = null;            //Connection 객체
@@ -81,8 +85,8 @@ public class MemberRepositoryV3 implements MemberRepositoryEx{
             }
 
         } catch (SQLException e) {
-            log.error("db error", e);
-            throw e;
+            //log.error("db error", e);
+            throw new MyDbException(e);
         } finally {
             //리소스 정리 : 반환할 때는 PreparedStatement를 먼저 종료하고, 그 다음에 Connection을 종료...    리소스 정리는 필수입니다!!!
             close(con, pstmt, rs);     //Connection과  PreparedStatement, ResultSet 연결 종료
@@ -97,7 +101,8 @@ public class MemberRepositoryV3 implements MemberRepositoryEx{
     /**
      * 3. 회원 정보 변경 함수
      */
-    public void update(String memberId, int money) throws SQLException {
+    @Override
+    public void update(String memberId, int money) {
         String sql = "update member set money=? where member_id=?";   //데이터베이스에 전달할 SQL을 정의
 
         Connection con = null;            //Connection 객체 생성
@@ -114,8 +119,8 @@ public class MemberRepositoryV3 implements MemberRepositoryEx{
 
             log.info("resultSize={}", resultSize);
         } catch (SQLException e) {
-            log.error("db error", e);
-            throw e;
+            //log.error("db error", e);
+            throw new MyDbException(e);
         } finally {
             //Connection 연결 종료는... Service 로직에서 필요!!!
             //리소스 정리 : 반환할 때는 PreparedStatement를 먼저 종료하고, 그 다음에 Connection을 종료...    리소스 정리는 필수입니다!!!
@@ -130,7 +135,8 @@ public class MemberRepositoryV3 implements MemberRepositoryEx{
     /**
      * 4. 회원 정보 삭제 함수
      */
-    public void delete(String memberId) throws SQLException {
+    @Override
+    public void delete(String memberId){
         String sql = "delete from member where member_id=?";   //데이터베이스에 전달할 SQL을 정의
 
         Connection con = null;            //Connection 객체 생성
@@ -145,7 +151,7 @@ public class MemberRepositoryV3 implements MemberRepositoryEx{
             pstmt.executeUpdate();                             //PreparedStatement 실행 : 준비된 SQL을 커넥션을 통해 실제 데이터베이스에 전달...  반환 값은 영향받은 DB row 수 이다...
         } catch (SQLException e) {
             log.error("db error", e);
-            throw e;
+            throw new MyDbException(e);
         } finally {
             //리소스 정리 : 반환할 때는 PreparedStatement를 먼저 종료하고, 그 다음에 Connection을 종료...    리소스 정리는 필수입니다!!!
             close(con, pstmt, null);
