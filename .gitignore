@@ -22,6 +22,7 @@ queridsl/gradlew
 queridsl/gradlew.bat
 queridsl/settings.gradle
 queridsl/src/main/resources
+queridsl/src/test/resources
 
 
 
@@ -35,3 +36,16 @@ jdbc/gradlew
 jdbc/gradlew.bat
 jdbc/settings.gradle
 jdbc/src/main/resources
+
+
+itemservice-db/.gradle
+itemservice-db/.idea
+itemservice-db/build/
+itemservice-db/gradle/
+itemservice-db/HELP.md
+itemservice-db/build.gradle
+itemservice-db/gradlew
+itemservice-db/gradlew.bat
+itemservice-db/settings.gradle
+itemservice-db/src/main/resources
+itemservice-db/src/test/resources
