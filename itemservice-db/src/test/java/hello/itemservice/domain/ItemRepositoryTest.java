@@ -17,47 +17,59 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ItemRepositoryTest {
 
     @Autowired
-    ItemRepository itemRepository;
+    ItemRepository itemRepository;  //ItemRepository 인터페이스
 
+
+    //@AfterEach : 각각의 테스트의 실행이 끝나는 시점에 호출
     @AfterEach
     void afterEach() {
-        //MemoryItemRepository 의 경우 제한적으로 사용
-        if (itemRepository instanceof MemoryItemRepository) {
-            ((MemoryItemRepository) itemRepository).clearStore();
+        //MemoryItemRepository의 경우 제한적으로 사용
+        if (itemRepository instanceof MemoryItemRepository) {   //itemRepository 인터페이스에는 clearStore() 메서드가 없기 때문에.. 다운캐스팅 수행...
+            ((MemoryItemRepository) itemRepository).clearStore();  //저장소 초기화..
         }
     }
 
+
+    /*
+     *1. 아이템을 하나 저장하고 잘 저장되었는지 검증
+     */
     @Test
     void save() {
         //given
         Item item = new Item("itemA", 10000, 10);
 
         //when
-        Item savedItem = itemRepository.save(item);
+        Item savedItem = itemRepository.save(item);   //아이템 저장
 
         //then
-        Item findItem = itemRepository.findById(item.getId()).get();
-        assertThat(findItem).isEqualTo(savedItem);
+        Item findItem = itemRepository.findById(item.getId()).get();   //아이템 조회
+        assertThat(findItem).isEqualTo(savedItem);  //검증
     }
 
+    /*
+     *2. 아이템을 하나 수정하고 잘 수정되었는지 검증
+     */
     @Test
     void updateItem() {
         //given
         Item item = new Item("item1", 10000, 10);
-        Item savedItem = itemRepository.save(item);
-        Long itemId = savedItem.getId();
+        Item savedItem = itemRepository.save(item);   //아이템 저장
+        Long itemId = savedItem.getId();             //아이템 조회
 
         //when
         ItemUpdateDto updateParam = new ItemUpdateDto("item2", 20000, 30);
-        itemRepository.update(itemId, updateParam);
+        itemRepository.update(itemId, updateParam);   //아이템 업데이트
 
         //then
-        Item findItem = itemRepository.findById(itemId).get();
-        assertThat(findItem.getItemName()).isEqualTo(updateParam.getItemName());
+        Item findItem = itemRepository.findById(itemId).get();   //아이템 조회
+        assertThat(findItem.getItemName()).isEqualTo(updateParam.getItemName());  //검증
         assertThat(findItem.getPrice()).isEqualTo(updateParam.getPrice());
         assertThat(findItem.getQuantity()).isEqualTo(updateParam.getQuantity());
     }
 
+    /*
+     *3. 아이템을 찾는 테스트
+     */
     @Test
     void findItems() {
         //given
@@ -65,28 +77,30 @@ class ItemRepositoryTest {
         Item item2 = new Item("itemA-2", 20000, 20);
         Item item3 = new Item("itemB-1", 30000, 30);
 
-        itemRepository.save(item1);
-        itemRepository.save(item2);
-        itemRepository.save(item3);
+        itemRepository.save(item1);   //아이템 저장
+        itemRepository.save(item2);   //아이템 저장
+        itemRepository.save(item3);   //아이템 저장
 
-        //둘 다 없음 검증
-        test(null, null, item1, item2, item3);
-        test("", null, item1, item2, item3);
+        //(itemName, maxPrice) 둘 다 없음 검증
+        test(null, null, item1, item2, item3);   //검증1 : 아이템 명, 최대 가격,  Item 객체들...
+        test("", null, item1, item2, item3);   //검증2 : 아이템 명, 최대 가격,  Item 객체들...
 
         //itemName 검증
-        test("itemA", null, item1, item2);
-        test("temA", null, item1, item2);
-        test("itemB", null, item3);
+        test("itemA", null, item1, item2);   //검증3 : 아이템 명, 최대 가격,  Item 객체들...
+        test("temA", null, item1, item2);   //검증3 : 아이템 명, 최대 가격,  Item 객체들...
+        test("itemB", null, item3);   //검증3 : 아이템 명, 최대 가격,  Item 객체들...
 
         //maxPrice 검증
-        test(null, 10000, item1);
+        test(null, 10000, item1);   //부분 검색
 
         //둘 다 있음 검증
-        test("itemA", 10000, item1);
+        test("itemA", 10000, item1);   //부분 검색
     }
 
     void test(String itemName, Integer maxPrice, Item... items) {
-        List<Item> result = itemRepository.findAll(new ItemSearchCond(itemName, maxPrice));
-        assertThat(result).containsExactly(items);
+        List<Item> result = itemRepository.findAll(new ItemSearchCond(itemName, maxPrice));  //아이템명과 최대가격으로 item 객체 조회
+        assertThat(result).containsExactly(items);         //아이템들이 순서에 맞게 조회되었는지 검증..
     }
+
+
 }

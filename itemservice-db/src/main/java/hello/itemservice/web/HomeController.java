@@ -10,6 +10,6 @@ public class HomeController {
 
     @RequestMapping("/")
     public String home() {
-        return "redirect:/items";
+        return "redirect:/items";  //리다이렉트
     }
 }
