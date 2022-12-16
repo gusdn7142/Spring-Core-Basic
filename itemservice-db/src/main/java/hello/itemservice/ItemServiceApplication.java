@@ -9,7 +9,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 
 //@Import(JdbcTemplateV1Config.class)                                 //JdbcTemplateV1Config를 Bean 등록 설정파일로 사용
-@Import(JdbcTemplateV2Config.class)                                 //JdbcTemplateV1Config를 Bean 등록 설정파일로 사용
+//@Import(JdbcTemplateV2Config.class)                                 //JdbcTemplateV1Config를 Bean 등록 설정파일로 사용
+@Import(JdbcTemplateV3Config.class)                                 //JdbcTemplateV1Config를 Bean 등록 설정파일로 사용
 @SpringBootApplication(scanBasePackages = "hello.itemservice.web")   //컴포넌트 스캔 범위 지정
 public class ItemServiceApplication {
 
