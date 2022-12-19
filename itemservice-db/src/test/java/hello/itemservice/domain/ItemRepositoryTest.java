@@ -5,19 +5,36 @@ import hello.itemservice.repository.ItemSearchCond;
 import hello.itemservice.repository.ItemUpdateDto;
 import hello.itemservice.repository.memory.MemoryItemRepository;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@SpringBootTest              //@SpringBootApplication이 붙은 클래스를 찾아서 설정으로 사용
 class ItemRepositoryTest {
 
     @Autowired
     ItemRepository itemRepository;  //ItemRepository 인터페이스
+
+    //트랜잭션 관련 코드
+    @Autowired
+    PlatformTransactionManager transactionManager;    //트랜잭션 매니저 참조변수 선언
+    TransactionStatus status;                        //TransactionStatus 참조변수
+
+
+    //@BeforeEach : 각각의 테스트의 실행이 시작되기 전에 호출
+    @BeforeEach
+    void beforeEach() {
+        //트랜잭션 시작
+        status = transactionManager.getTransaction(new DefaultTransactionDefinition());
+    }
 
 
     //@AfterEach : 각각의 테스트의 실행이 끝나는 시점에 호출
@@ -27,6 +44,9 @@ class ItemRepositoryTest {
         if (itemRepository instanceof MemoryItemRepository) {   //itemRepository 인터페이스에는 clearStore() 메서드가 없기 때문에.. 다운캐스팅 수행...
             ((MemoryItemRepository) itemRepository).clearStore();  //저장소 초기화..
         }
+
+        //트랜잭션 롤백
+        transactionManager.rollback(status);
     }
 
 
