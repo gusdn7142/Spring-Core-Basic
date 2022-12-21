@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="hello.itemservice.repository.mybatis.ItemMapper">
+
+    <!--Insert 쿼리문 작성 -->
+    <insert id="save" useGeneratedKeys="true" keyProperty="id">     <!-- 기본키 필드를 id로 설정 -->
+        insert into item (item_name, price, quantity)
+        values (#{itemName}, #{price}, #{quantity})      <!-- getter()로 각 필드를 조회해옴.    -->
+    </insert>
+
+    <!--update 쿼리문 작성 -->
+    <update id="update">
+        update item
+        set item_name=#{updateParam.itemName},      <!-- updateParam DTO객체에서 getter()로 해당 필드를 조회해옴.    -->
+            price=#{updateParam.price},             <!-- updateParam DTO객체에서 getter()로 해당 필드를 조회해옴.    -->
+            quantity=#{updateParam.quantity}        <!-- updateParam DTO객체에서 getter()로 해당 필드를 조회해옴.    -->
+        where id = #{id}                            <!-- getter()로 각 필드를 조회해옴.    -->
+    </update>
+
+    <!--select 쿼리문 작성 -->
+    <select id="findById" resultType="Item">        <!--application.properties 파일에 패키지 경로를 명시해 주었기 때문에 resultType에 "Item" 경로만 적어주어도 됨     -->
+        select id, item_name, price, quantity
+        from item
+        where id = #{id}                           <!-- getter()로 id 필드를 조회해옴.    -->
+    </select>
+
+    <!--select 쿼리문 작성 -->
+    <select id="findAll" resultType="Item">        <!--application.properties 파일에 패키지 경로를 명시해 주었기 때문에 resultType에 "Item" 경로만 적어주어도 됨     -->
+        select id, item_name, price, quantity
+        from item
+        <where>
+            <if test="itemName != null and itemName != ''">              <!-- 동적 쿼리 조건 입력 : itemName 필드가 null이 아니면  -->
+                and item_name like concat('%', #{itemName}, '%')        <!-- itemSearch DTO객체에서 getter()로 itemName 필드를 조회해와서 조건 설정    -->
+            </if>
+            <if test="maxPrice != null">                               <!-- 동적 쿼리 조건 입력 : maxPrice 필드가 null이 아니면   -->
+                and price &lt;= #{maxPrice}                               <!-- itemSearch DTO객체에서 getter()로 maxPrice 필드를 조회해와서 조건 설정    -->
+            </if>
+        </where>
+    </select>
+
+</mapper>
