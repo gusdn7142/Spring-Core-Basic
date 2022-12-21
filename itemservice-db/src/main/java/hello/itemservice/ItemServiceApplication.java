@@ -31,7 +31,7 @@ public class ItemServiceApplication {
 	}
 
 
-	@Bean
+/*	@Bean
 	@Profile("test")   //특정 프로필("test")의 경우에만 해당 스프링 빈을 등록
 	public DataSource dataSource() {
 
@@ -43,7 +43,7 @@ public class ItemServiceApplication {
 		dataSource.setUsername("sa");
 		dataSource.setPassword("");
 		return dataSource;
-	}
+	}*/
 
 
 
