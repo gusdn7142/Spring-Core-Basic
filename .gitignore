@@ -47,8 +47,6 @@ itemservice-db/build.gradle
 itemservice-db/gradlew
 itemservice-db/gradlew.bat
 itemservice-db/settings.gradle
-itemservice-db/src/main/resources/static
-itemservice-db/src/main/resources/templates
 itemservice-db/src/main/resources/application.properties
 
 
