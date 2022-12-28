@@ -18,7 +18,8 @@ import javax.sql.DataSource;
 //@Import(JdbcTemplateV3Config.class)                                 //JdbcTemplateV3Config를 Bean 등록 설정파일로 사용
 //@Import(MyBatisConfig.class)                                          //MyBatisConfig Bean 등록 설정파일로 사용
 //@Import(JpaConfig.class)
-@Import(SpringDataJpaConfig.class)
+//@Import(SpringDataJpaConfig.class)
+@Import(QueryDslConfig.class)
 @SpringBootApplication(scanBasePackages = "hello.itemservice.web")   //컴포넌트 스캔 범위 지정
 public class ItemServiceApplication {
 
