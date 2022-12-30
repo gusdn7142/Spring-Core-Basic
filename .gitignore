@@ -53,3 +53,25 @@ itemservice-db/src/main/resources/application.properties
 
 
 itemservice-db/src/test/resources
+
+
+
+
+
+
+springtx/.gradle
+springtx/.idea
+springtx/build/
+springtx/gradle/
+springtx/HELP.md
+springtx/build.gradle
+springtx/gradlew
+springtx/gradlew.bat
+springtx/settings.gradle
+springtx/src/main/resources/
+
+
+
+
+
+
