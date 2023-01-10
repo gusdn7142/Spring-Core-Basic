@@ -96,4 +96,33 @@ public class BasicTxTest {
     }
 
 
+    //테스트5 -  하나의 로직에서 외부/내부 트랜잭션 실행 및 커밋
+    @Test
+    void inner_commit() {
+
+        log.info("외부 트랜잭션 시작");
+        TransactionStatus outer = txManager.getTransaction(new DefaultTransactionAttribute());     //외부(논리) 트랜잭션 연결+얻기
+        log.info("outer.isNewTransaction()={}", outer.isNewTransaction());                        //처음 실행된 트랜잭션인지 검증 : true
+
+        log.info("내부 트랜잭션 시작");
+        TransactionStatus inner = txManager.getTransaction(new DefaultTransactionAttribute());     //내부(논리) 트랜잭션 연결+얻기 : 외부 트랜잭션과 같은 커넥션 사용.
+        log.info("inner.isNewTransaction()={}", inner.isNewTransaction());                        //처음 실행된 트랜잭션인지 검증 : false
+
+        log.info("내부 트랜잭션 커밋");
+        txManager.commit(inner);       //내부(논리) 트랜잭션 커밋
+
+        log.info("외부 트랜잭션 커밋");
+        txManager.commit(outer);       //외부(논리) 트랜잭션 커밋
+
+    }
+
+
+
+
+
+
+
+
+
+
 }
