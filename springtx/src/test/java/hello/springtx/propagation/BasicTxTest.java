@@ -9,7 +9,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 
 import javax.sql.DataSource;
 
@@ -118,10 +121,47 @@ public class BasicTxTest {
 
 
 
+    //테스트6 - 하나의 로직에서 내부 트랜잭션 커밋⋆외부 트랜잭션 롤백
+    @Test
+    void outer_rollback() {
+
+        log.info("외부 트랜잭션 시작");
+        TransactionStatus outer = txManager.getTransaction(new DefaultTransactionAttribute());     //외부(논리) 트랜잭션 연결+얻기
+        log.info("outer.isNewTransaction()={}", outer.isNewTransaction());                        //처음 실행된 트랜잭션인지 검증 : true
+
+        log.info("내부 트랜잭션 시작");
+        TransactionStatus inner = txManager.getTransaction(new DefaultTransactionAttribute());     //내부(논리) 트랜잭션 연결+얻기 : 외부 트랜잭션과 같은 커넥션 사용.
+        log.info("inner.isNewTransaction()={}", inner.isNewTransaction());                        //처음 실행된 트랜잭션인지 검증 : false
+
+        log.info("내부 트랜잭션 커밋");
+        txManager.commit(inner);       //내부(논리) 트랜잭션 커밋
+
+        log.info("외부 트랜잭션 롤백");
+        txManager.rollback(outer);       //외부(논리) 트랜잭션 롤백
+
+    }
 
 
+    //테스트7 - 하나의 로직에서 내부 트랜잭션 롤백⋆외부 트랜잭션 커밋
+    @Test
+    void inner_rollback() {
 
+        log.info("외부 트랜잭션 시작");
+        TransactionStatus outer = txManager.getTransaction(new DefaultTransactionAttribute());     //외부(논리) 트랜잭션 연결+얻기
+        log.info("outer.isNewTransaction()={}", outer.isNewTransaction());                        //처음 실행된 트랜잭션인지 검증 : true
 
+        log.info("내부 트랜잭션 시작");
+        TransactionStatus inner = txManager.getTransaction(new DefaultTransactionAttribute());     //내부(논리) 트랜잭션 연결+얻기 : 외부 트랜잭션과 같은 커넥션 사용.
+        log.info("inner.isNewTransaction()={}", inner.isNewTransaction());                        //처음 실행된 트랜잭션인지 검증 : false
+
+        log.info("내부 트랜잭션 롤백");
+        txManager.rollback(inner);       //내부(논리) 트랜잭션 롤백...  rollback-only 표시
+
+        log.info("외부 트랜잭션 커밋");
+        //txManager.commit(outer);       //외부(논리) 트랜잭션 커밋...  Global transaction is marked as rollback-only but transactional code requested commit
+        assertThatThrownBy(() -> txManager.commit(outer)).isInstanceOf(UnexpectedRollbackException.class);   //UnexpectedRollbackException 발생 여부 확인
+
+    }
 
 
 
