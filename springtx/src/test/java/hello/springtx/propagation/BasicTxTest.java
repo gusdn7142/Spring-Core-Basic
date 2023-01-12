@@ -184,7 +184,7 @@ public class BasicTxTest {
         log.info("inner.isNewTransaction()={}", inner.isNewTransaction());                        //처음 실행된 트랜잭션인지 검증 : false
 
         log.info("내부 트랜잭션 롤백");
-        txManager.rollback(inner);       //내부(논리) 트랜잭션 롤백...  rollback-only 표시
+        txManager.rollback(inner);       //내부(논리) 트랜잭션 롤백...
 
         log.info("외부 트랜잭션 커밋");
         txManager.commit(outer);       //외부(논리) 트랜잭션 커밋...
