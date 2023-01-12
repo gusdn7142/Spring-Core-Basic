@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.interceptor.DefaultTransactionAttribute;
@@ -162,6 +163,38 @@ public class BasicTxTest {
         assertThatThrownBy(() -> txManager.commit(outer)).isInstanceOf(UnexpectedRollbackException.class);   //UnexpectedRollbackException 발생 여부 확인
 
     }
+
+
+
+
+
+    //테스트8 - 하나의 로직에서 내부 트랜잭션 롤백⋆외부 트랜잭션 커밋 (+REQUIRES_NEW 사용)
+    @Test
+    void inner_rollback_requires_new() {
+
+        log.info("외부 트랜잭션 시작");
+        TransactionStatus outer = txManager.getTransaction(new DefaultTransactionAttribute());     //외부(논리) 트랜잭션 연결+얻기
+        log.info("outer.isNewTransaction()={}", outer.isNewTransaction());                        //처음 실행된 트랜잭션인지 검증 : true
+
+        log.info("내부 트랜잭션 시작");
+        DefaultTransactionAttribute definition = new DefaultTransactionAttribute();
+        definition.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);  //PROPAGATION_REQUIRES_NEW : 기존 트랜잭션이 있어도 새로운 물리 트랜잭션을 만든다.
+
+        TransactionStatus inner = txManager.getTransaction(definition);                            //내부(논리) 트랜잭션 연결+얻기 : 신규 트랜잭션 조회
+        log.info("inner.isNewTransaction()={}", inner.isNewTransaction());                        //처음 실행된 트랜잭션인지 검증 : false
+
+        log.info("내부 트랜잭션 롤백");
+        txManager.rollback(inner);       //내부(논리) 트랜잭션 롤백...  rollback-only 표시
+
+        log.info("외부 트랜잭션 커밋");
+        txManager.commit(outer);       //외부(논리) 트랜잭션 커밋...
+        //assertThatThrownBy(() -> txManager.commit(outer)).isInstanceOf(UnexpectedRollbackException.class);   //UnexpectedRollbackException 발생 여부 확인
+
+    }
+
+
+
+
 
 
 
