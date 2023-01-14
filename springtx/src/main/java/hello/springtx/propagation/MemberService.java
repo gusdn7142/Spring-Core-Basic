@@ -3,6 +3,7 @@ package hello.springtx.propagation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -13,6 +14,7 @@ public class MemberService {
     private final LogRepository logRepository;
 
     //1. 회원 등록 & 로그 등록
+    @Transactional //추가
     public void joinV1(String username) {
         Member member = new Member(username);  //Member 객체 생성
         Log logMessage = new Log(username);    //(username필드값을 message에 넣어) Log 객체 생성

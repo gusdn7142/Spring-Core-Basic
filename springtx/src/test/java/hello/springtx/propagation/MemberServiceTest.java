@@ -63,4 +63,29 @@ class MemberServiceTest {
     }
 
 
+
+    //테스트3 - 회원정보 등록시 커밋, 로그정보 등록시 롤백으로 인해 전체 롤백 상황 (MemberService에만  @Transactional 적용)
+    /**
+     * MemberService @Transactional:ON
+     * MemberRepository @Transactional:OFF
+     * LogRepository @Transactional:OFF
+     */
+    @Test
+    void singleTx() {
+
+        //given
+        String username = "로그예외_singleTx";   //username 필드에 값 입력
+
+        //when
+        //memberService.joinV1(username);   //회원 등록 & 로그 등록
+        assertThatThrownBy(() -> memberService.joinV1(username)).isInstanceOf(RuntimeException.class);   //회원 등록 & 로그 등록(+RuntimeException예외 발생)
+
+        //then: 모든 데이터가 정상 저장
+        assertTrue(memberRepository.find(username).isEmpty());   //username을 통해 회원 조회.. 비어있음.
+        assertTrue(logRepository.find(username).isEmpty());      //username(==message필드값)을 통해 로그 조회.. 비어있음.
+
+    }
+    
+
+
 }

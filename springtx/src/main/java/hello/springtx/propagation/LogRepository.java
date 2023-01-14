@@ -20,7 +20,7 @@ public class LogRepository {
     private final EntityManager em;      //EntityManager에 의존성 주입
 
     //로그 등록
-    @Transactional
+    //@Transactional  //제거
     public void save(Log logMessage) {
         log.info("log 저장");
         em.persist(logMessage);  //영속성 컨텍스트에의 1차 캐시에 member 객체를 저장하고 쓰기지연 SQL 저장소에 Insert 쿼리 저장 후 커밋될떄 DB에 전달

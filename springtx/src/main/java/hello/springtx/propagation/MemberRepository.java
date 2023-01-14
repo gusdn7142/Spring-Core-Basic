@@ -20,7 +20,7 @@ public class MemberRepository {
     private final EntityManager em;    //EntityManager에 의존성 주입
 
     //회원 등록
-    @Transactional
+    //@Transactional //제거
     public void save(Member member) {
         log.info("member 저장");
         em.persist(member);   //영속성 컨텍스트에의 1차 캐시에 member 객체를 저장하고 쓰기지연 SQL 저장소에 Insert 쿼리를 저장 후 후 커밋될떄 DB에 SQL 전달
