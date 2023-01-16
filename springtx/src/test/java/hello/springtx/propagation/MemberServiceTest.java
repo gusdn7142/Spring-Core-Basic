@@ -85,7 +85,30 @@ class MemberServiceTest {
         assertTrue(logRepository.find(username).isEmpty());      //username(==message필드값)을 통해 로그 조회.. 비어있음.
 
     }
-    
+
+
+    //테스트4 - 회원정보 등록시 커밋, 로그정보 등록시 커밋 상황 (MemberService과 MemberRepository과 LogRepository에 @Transactional 적용)
+    /**
+     * MemberService @Transactional:ON
+     * MemberRepository @Transactional:ON
+     * LogRepository @Transactional:ON
+     */
+    @Test
+    void outerTxOn_success() {
+        //given
+        String username = "outerTxOn_success";   //username 필드에 값 입력
+
+        //when
+        memberService.joinV1(username);   //회원 등록 & 로그 등록
+
+        //then: 모든 데이터가 정상 저장된다.
+        assertTrue(memberRepository.find(username).isPresent());   //username을 통해 회원 조회..
+        assertTrue(logRepository.find(username).isPresent());      //username(==message필드값)을 통해 로그 조회.
+    }
+
+
+
+
 
 
 }
