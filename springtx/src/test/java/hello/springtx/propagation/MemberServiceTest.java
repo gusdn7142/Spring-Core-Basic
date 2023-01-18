@@ -130,6 +130,26 @@ class MemberServiceTest {
     }
 
 
+    //테스트6 - 회원정보 등록시 커밋, 로그정보 등록시 롤백으로 전체 롤백 상황 (rollbackOnly==true, UnexpectedRollbackException 발생...  MemberService과 MemberRepository과 LogRepository에 @Transactional 적용)
+    /**
+     * MemberService @Transactional:ON
+     * MemberRepository @Transactional:ON
+     * LogRepository @Transactional:ON Exception
+     */
+    @Test
+    void recoverException_fail() {
+        //given
+        String username = "로그예외_recoverException_fail";
+
+        //when
+        assertThatThrownBy(() -> memberService.joinV2(username)).isInstanceOf(UnexpectedRollbackException.class);   //회원 등록 & 로그 등록(+RuntimeException예외를 복구).. 내부에 rollbackOnly=true 설정으로 인해 UnexpectedRollbackException 예외 발생
+
+        //then: 모든 데이터가 롤백된다.
+        assertTrue(memberRepository.find(username).isEmpty());  //username을 통해 회원 조회.. 비어있음.
+        assertTrue(logRepository.find(username).isEmpty());     //username(==message필드값)을 통해 로그 조회.. 비어있음.
+    }
+
+
 
 
 }

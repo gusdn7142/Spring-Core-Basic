@@ -31,6 +31,7 @@ public class MemberService {
 
 
     //2. 회원 등록 & 로그 등록(+예외처리)
+    @Transactional //추가
     public void joinV2(String username) {
 
         Member member = new Member(username);  //Member 객체 생성
