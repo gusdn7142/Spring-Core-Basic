@@ -151,5 +151,26 @@ class MemberServiceTest {
 
 
 
+    //테스트7 - 회원정보 등록시 커밋, 로그정보 등록시 롤백 상황 (로그 등록시 REQUIRES_NEW로 별도의 물리 트랜잭션을 적용, MemberService과 MemberRepository과 LogRepository에 @Transactional 적용)
+    /**
+     * MemberService @Transactional:ON
+     * MemberRepository @Transactional:ON
+     * LogRepository @Transactional(REQUIRES_NEW) Exception
+     */
+    @Test
+    void recoverException_success() {
+
+        //given
+        String username = "로그예외_recoverException_success";
+
+        //when
+        memberService.joinV2(username);   //회원 등록 & 로그 등록(+RuntimeException예외를 복구)..
+
+        //then: member 저장, log 롤백
+        assertTrue(memberRepository.find(username).isPresent());   //username을 통해 회원 조회..
+        assertTrue(logRepository.find(username).isEmpty());     //username(==message필드값)을 통해 로그 조회.. 비어있음.
+    }
+
+
 
 }
